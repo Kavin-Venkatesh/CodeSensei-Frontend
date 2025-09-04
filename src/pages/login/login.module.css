@@ -1,0 +1,199 @@
+.loginContainer{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    align-items: center;
+    /* justify-content: center; */
+    width: 100%;
+    height: 100%;
+}
+
+
+.loginFormContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--primary-light);
+    width: 28vw;
+    height: 75vh;
+    border-radius: 20px;
+    margin: 6rem 0 0 0;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.loginFormContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 20px 20px 0 0;
+}
+
+.loginFormContainer:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.loginFormContainer span{
+    color: var(--accent-dark);
+    font-size: 2.1rem;
+}
+
+.loginFormContainer h2{
+    font-size: 2.1rem;
+}
+.imageStyle{
+    margin: 0;
+    width : 20rem;
+    height: 16rem;
+}
+
+.googleButton{
+    margin-top: 3rem;
+    width: 25rem;
+    height: 3.5rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    background-color: var(--background-alt);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.googleButton div {
+    width: 100%;
+    height: 100%;
+}
+
+.googleButton button {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 5px !important;
+    font-size: 1.2rem !important;
+    background-color: var(--background-alt) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--text-light) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.googleButton div[data-testid="google-login"] {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.googleButton div[data-testid="google-login"] > div {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 1.2rem !important;
+    background-color: var(--background-alt) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--text-light) !important;
+    border-radius: 5px !important;
+}
+
+.googleButton span {
+    font-size: 1.2rem !important;
+    color: var(--text) !important;
+    font-family: inherit !important;
+}
+
+@media screen and (max-width: 1440px) {
+    .loginFormContainer{
+        width: 60vw;
+        height: 70vh;
+        margin: 5rem 0 0 0;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .loginFormContainer{
+        width: 80vw;
+        height: 70vh;
+        margin: 4rem 0 0 0;
+    }
+
+    .loginFormContainer h2{
+        font-size: 2rem;
+        margin : 0 0 0 6rem;
+    }
+
+    .loginFormContainer span{
+        font-size: 2rem;
+    }
+
+    .imageStyle{
+        width : 15rem;
+        height: 12rem;
+    }
+    .googleButton{
+        width: 20rem;
+        height: 3rem;
+        font-size: 1rem;
+    }
+    .googleButton button {
+        font-size: 1rem !important;
+    }
+    .googleButton span {
+        font-size: 1rem !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .loginFormContainer{
+        width: 90vw;
+        height: 75vh;
+        margin: 2rem 0 0 0;
+        align-items: center;
+        justify-content: center;
+    }
+    .imageStyle{
+        width : 12rem;
+        height: 10rem;
+    }
+    .googleButton{
+        width: 18rem;
+        height: 2.5rem;
+        font-size: 0.9rem;
+    }
+    .googleButton button {
+        font-size: 0.9rem !important;
+    }
+    .googleButton span {
+        font-size: 0.9rem !important;
+    }
+}
+
+@media (min-width : 789px ) and (max-width : 1024px ) and (orientation : landscape) {
+    .loginFormContainer{
+        width: 50vw;
+        height: 85vh;
+        margin: 4rem 0 0 0;
+    }
+    .imageStyle{
+        width : 18rem;
+        height: 14rem;
+    }
+    .googleButton{
+        width: 22rem;
+        height: 3rem;
+        font-size: 1.1rem;
+    }
+    .googleButton button {
+        font-size: 1.1rem !important;
+    }
+    .googleButton span {
+        font-size: 1.1rem !important;
+    }
+}
