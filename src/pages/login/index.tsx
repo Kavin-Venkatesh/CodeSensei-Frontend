@@ -11,7 +11,7 @@ const Login = () =>{
         localStorage.setItem("access_token" , token);
         localStorage.setItem("user" , JSON.stringify(user));
 
-        navigate('/home');
+         navigate(`/home/${user.id}`);
     }
     
     return(

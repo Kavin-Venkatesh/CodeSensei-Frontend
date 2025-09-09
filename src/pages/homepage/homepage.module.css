@@ -8,6 +8,18 @@
     align-items: center;
 }
 
+.homeMainContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.homeMainContainer::-webkit-scrollbar-track {
+    background: #f9f9f9;
+}
+
+.homeMainContainer::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+}
 .homeMainContainer h1{
     font-size: 3rem;
     color: #333;
@@ -202,14 +214,43 @@
 .courseCard {
     background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
     border: 1px solid #ddd;
+   align-items: center; 
+   justify-content: center;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 15rem;
-    padding: 4.5rem;
+    width: 20rem;
+    padding : 4rem;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
+
+.courseCard h3{
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+.courseCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+.courseDescription {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 0.5rem;
+    min-height: 40px;
+    line-height: 1.4;
+    text-align: center;
+    height: 4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    margin-bottom: 1rem;
+}
+
 
 
 .cardCourseTitle {
