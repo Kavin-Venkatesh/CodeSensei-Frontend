@@ -21,6 +21,7 @@
   --background: #F9FAFB;
   --background-alt: #FFFFFF;
   --surface: #F3F4F6;
+  --editor-style : #1e1e1e;
 
   /* Text colors */
   --text: #111827;
@@ -31,6 +32,7 @@
   --success: #22C55E;
   --warning: #FACC15;
   --error: #EF4444;
+
 }
 
 body {

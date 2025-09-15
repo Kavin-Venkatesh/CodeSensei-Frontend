@@ -11,6 +11,7 @@ import { IoMenuSharp } from "react-icons/io5";
 import EditorComponent from "./components/editorComponent";
 import { useParams } from "react-router-dom";
 import axios from 'axios';
+import AssessPanel from "./components/AssesPanel";
 
 
 interface Topics{
@@ -33,6 +34,7 @@ interface TopicsApiResponse {
 const LearningPage = () =>{
     const [isLearningPathVisible, setIsLearningPathVisible] = useState(true);
     const [learningPath, setLearningPath] = useState<Topics[]>([]);
+    const [selectedTopic, setSelectedTopic] = useState<Topics | null>(null);
 
     const {id} = useParams();
 
@@ -64,7 +66,7 @@ const LearningPage = () =>{
         const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
         const accessToken = localStorage.getItem("access_token");
 
-        const response = await axios.get<TopicsApiResponse[]>(`${backendUrl}/api/topics/${id}`, {
+        const response = await axios.get<TopicsApiResponse>(`${backendUrl}/api/topics/${id}`, {
             headers: {
                 'Content-Type': 'application/json',
                 ...(accessToken && {
@@ -74,7 +76,15 @@ const LearningPage = () =>{
         });
 
         console.log(response.data.data.topics);
-        setLearningPath(response.data.data.topics);
+        const topics = response.data.data.topics;
+        setLearningPath(topics);
+
+        // Set the first incomplete topic as selected, or the first topic if all are completed
+        const firstIncomplete = topics.find(topic => !topic.is_completed);
+        const topicToSelect = firstIncomplete || topics[0];
+        if (topicToSelect) {
+            setSelectedTopic(topicToSelect);
+        }
 
     } catch (err) {
         console.error("Error fetching topics:", err);
@@ -93,6 +103,10 @@ const LearningPage = () =>{
         setIsLearningPathVisible(!isLearningPathVisible);
     };
 
+    const handleTopicSelect = (topic: Topics) => {
+        setSelectedTopic(topic);
+    };
+
     return(
         <div className ={styles.learningMainContainer}>
             <div className= {styles.learningNavbar}>
@@ -100,7 +114,7 @@ const LearningPage = () =>{
                     className={styles.menuIcon} 
                     onClick={toggleLearningPath}
                 />
-                <h1>Understanding Loops in Python</h1>
+                <h1>{selectedTopic ? selectedTopic.topic_title : 'Select a Topic'}</h1>
             </div>
             <div className={styles.learningContent}>
 
@@ -115,7 +129,9 @@ const LearningPage = () =>{
                     {learningPath.map(item => (
                         <li
                             key={item.topic_id}
-                            className={`${styles.learningPathItem} ${item.is_completed ? styles.completed : ''}`}
+                            className={`${styles.learningPathItem} ${item.is_completed ? styles.completed : ''} ${selectedTopic?.topic_id === item.topic_id ? styles.selected : ''}`}
+                            onClick={() => handleTopicSelect(item)}
+                            style={{ cursor: 'pointer' }}
                         >   
                             {item.is_completed ? <SiTicktick className={styles.icon} /> : <FaLock className={styles.icon} />}
                             {item.topic_title}
@@ -132,20 +148,23 @@ const LearningPage = () =>{
             <div className={styles.contentMainContainer}>
                 <div className={styles.learningContentHeader}>
                     <FaLightbulb className={styles.explanationIcon} />
-                    <h3>Explanation</h3>
+                    <h3> {selectedTopic ? (
+                        <div>
+                            <p>{selectedTopic.topic_description}</p>
+                            {/* You can add more dynamic content here based on the topic */}
+                        </div>
+                    ) : (
+                        <div>
+                            <p>Please select a topic from the learning path to view its content.</p>
+                        </div>
+                    )}</h3>
                     <button className={styles.readAloudButton}>Read Loud</button>
                 </div>
 
                 <div className={styles.learningContentBody}>
-                <p>This loop is used when we know how many times we want to repeat.</p>
+                   
 
-                    <pre>
-                <code>
-                # Using a for loop to print numbers from 1 to 5
-                for i in range(1, 6):
-                    print("Number:", i)
-                </code>
-                    </pre>
+                    
 
                     <h3>Explanation:</h3>
                     <ul>
@@ -189,9 +208,13 @@ const LearningPage = () =>{
             </div>
             </div>
             
-           <div className={styles.editorSection}> 
+        
+                <AssessPanel />
+            
+            
+           {/* <div className={styles.editorSection}> 
                 <EditorComponent />
-           </div>
+           </div> */}
 
 
         </div>

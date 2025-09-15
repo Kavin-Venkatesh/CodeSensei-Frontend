@@ -1,0 +1,30 @@
+.assessmentMainContainer{
+    width: 100%;
+    height : 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+
+.assessLeftContainer{
+    width : 48vw;
+    height:60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: aqua;
+    overflow: hidden;
+    margin : 1rem;
+
+}
+.assessRightContainer{
+    width: 48vw;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin : 1rem;
+}

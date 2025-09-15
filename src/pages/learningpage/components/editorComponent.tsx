@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import OurEditor from "../../../components/editor";
+import { IoMdRefresh } from "react-icons/io";
 import styles from '../learning.module.css';
 
 interface ExecutionResult {
@@ -12,11 +13,12 @@ interface ExecutionResult {
 }
 
 const EditorComponent = () => {
-    const [code, setCode] = useState('# Write your Python code here\nprint("Hello, World!")');
-    const [output, setOutput] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const [executionTime, setExecutionTime] = useState<number | null>(null);
+    const [code, setCode] = useState('# Write your code here');
+
+    const [activeTab, setActiveTab] = useState<"input" | "output">("input")
+    const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState<ExecutionResult | null>(null);
+    const [codeInput, setCodeInput] = useState("");
 
     const handleCodeChange = (newCode: string | undefined) => {
         if (newCode !== undefined) {
@@ -24,143 +26,171 @@ const EditorComponent = () => {
         }
     };
 
-    const executeCode = async () => {
-        setIsLoading(true);
-        setOutput('');
-        setError('');
-        setExecutionTime(null);
+    const handleResetCode = () => {
+        if (code) {
+            setCode("");
+        }
+    }
 
-        const startTime = Date.now();
+
+    const handleRun = async () => {
+        setLoading(true);
+        setActiveTab("output");
+        setResult(null);
+
 
         try {
-            // Use the same backend URL pattern as in GoogleLoginButton
+            const token = localStorage.getItem("access_token");
+            const body = {
+                code,
+                language_id: 91,
+                stdin: codeInput,
+                userToken: token  // pass it here if needed
+            };
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-            const response = await axios.post<ExecutionResult>(`${backendUrl}/api/code/execute`, {
-                code: code,
-                language: 'python',
-                // Optional: add user authentication if needed
-                ...(localStorage.getItem("access_token") && {
+            const response = await axios.post(`${backendUrl}/api/code/execute`, body,
+                {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
-                })
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(localStorage.getItem("access_token") && {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
-                    })
-                }
+                });
+
+            console.log(response);
+
+            setResult(
+                {
+                    output: response.data.output,
+                    error: response.data.error,
+                    status: response.data.error ? "error" : "success",
+                    executionTime: response.data.executionTime,
+                    memoryUsage: response.data.memoryUsage
+                });
+
+        } catch (err: any) {
+            setResult({
+                error: err.response?.data?.error || "Something went wrong",
+                status: "error",
             });
-
-            const endTime = Date.now();
-            setExecutionTime(endTime - startTime);
-
-            if (response.data.status === 'success') {
-                setOutput(response.data.output || '');
-            } else {
-                setError(response.data.error || 'Unknown error occurred');
-            }
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                if (err.response?.status === 401) {
-                    setError('Authentication failed. Please log in again.');
-                } else if (err.response?.status === 429) {
-                    setError('Too many requests. Please wait before trying again.');
-                } else if (err.response && err.response.status >= 500) {
-                    setError('Server error. Please try again later.');
-                } else {
-                    setError(err.response?.data?.message || err.response?.data?.error || err.message);
-                }
-            } else {
-                setError('An unexpected error occurred');
-            }
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
-    };
+    }
 
-    const clearOutput = () => {
-        setOutput('');
-        setError('');
-        setExecutionTime(null);
-    };
 
-    const resetCode = () => {
-        setCode('# Write your Python code here\nprint("Hello, World!")');
-        clearOutput();
-    };
 
-    const language = "python";
-    const theme = "vs-dark";
+
+
 
     return (
         <div className={styles.codeEditorContainer}>
             <div className={styles.editorSection}>
-                <div className={styles.editorHeader}>
-                    <h3>Code Editor</h3>
-                    <div className={styles.editorControls}>
-                        <button 
-                            onClick={executeCode} 
-                            disabled={isLoading}
-                            className={styles.runButton}
-                        >
-                            {isLoading ? 'Running...' : 'Run Code'}
-                        </button>
-                        <button 
-                            onClick={clearOutput}
-                            className={styles.clearButton}
-                        >
-                            Clear Output
-                        </button>
-                        <button 
-                            onClick={resetCode}
+                <OurEditor
+                    value={code}
+                    onChange={handleCodeChange}
+                    language="java"
+                    theme="vs-dark"
+                />
+
+                <div className={styles.editorBottom}>
+                    <div>
+                        <button
+                            title='Click to reset the code'
                             className={styles.resetButton}
+                            onClick={handleResetCode}
                         >
-                            Reset Code
+                            <IoMdRefresh />
                         </button>
-                    
+
+                        <button
+                            className={`${styles.switchButtons} ${activeTab === 'input' ? styles.active : ""}`}
+
+                            onClick={() => setActiveTab("input")}
+                        >
+                            Input Console
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("output")}
+                            className={`${styles.switchButtons} ${activeTab === 'output' ? styles.active : ""}`}
+                        > Output Console</button>
+                    </div>
+                    <div>
+                        <button
+                            className={styles.runButton}
+                            title='Click to run the code '
+                            onClick={handleRun}
+                            disabled={loading}
+                        >
+                            {loading ?
+                                <div className={styles.ldsEllipsis}><div></div><div></div><div></div></div>
+                                :
+                                "Run"}
+                        </button>
                     </div>
                 </div>
-                <OurEditor 
-                    value={code} 
-                    onChange={handleCodeChange}
-                    language={language}
-                    theme={theme}
-                />
-            </div>
-            
-            <div className={styles.outputSection}>
-                <div className={styles.outputHeader}>
-                    <h3>Output</h3>
-                    {executionTime !== null && (
-                        <span className={styles.executionTime}>
-                            Executed in {executionTime}ms
-                        </span>
-                    )}
-                </div>
-                <div className={styles.outputContent}>
-                    {isLoading && (
-                        <div className={styles.loadingIndicator}>
-                            <span>Executing code...</span>
-                        </div>
-                    )}
-                    {error && (
-                        <div className={styles.errorOutput}>
-                            <strong>Error:</strong>
-                            <pre>{error}</pre>
-                        </div>
-                    )}
-                    {output && !error && (
-                        <div className={styles.successOutput}>
-                            <pre>{output}</pre>
-                        </div>
-                    )}
-                    {!output && !error && !isLoading && (
-                        <div className={styles.emptyOutput}>
-                            Click "Run Code" to see the output here
-                        </div>
-                    )}
+
+
+                <div className={styles.InputOutputContainer}>
+                    {/* input Container */}
+
+                    {
+                        activeTab === 'input' ?
+                            (
+                                <div className={styles.inputContainer}>
+                                    <textarea className={styles.editorInputFeild}
+                                        value={codeInput}
+                                        onChange={(e) => { setCodeInput(e.target.value) }}
+                                    />
+                                </div>
+                            )
+                            :
+                            (
+                                <div className={styles.outputContainer}>
+                                    <div className={styles.outputContent}>
+                                        {result ? (
+                                            <>
+                                                {result.status === "success" && (
+                                                    <>
+                                                        {result.output && (
+                                                            <pre className={styles.consoleSuccess}>{result.output}</pre>
+                                                        )}
+                                                        <div className={styles.metaInfo}>
+                                                            <span>⏱ {result.executionTime} ms</span>
+                                                            <span>💾 {result.memoryUsage} KB</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {result.status === "error" && (
+                                                    <pre className={styles.consoleError}>{result.error}</pre>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <pre className={styles.consolePlaceholder}>
+
+
+                                                <div aria-label="Loading..." role="status" className={styles.loader}>
+                                                    <svg className={styles.spinnericon} viewBox="0 0 256 256">
+                                                        <line x1="128" y1="32" x2="128" y2="64" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="224" y1="128" x2="192" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="128" y1="224" x2="128" y2="192" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="32" y1="128" x2="64" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                        <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                                                    </svg>
+                                                    <span className={styles.loadingText}></span>
+                                                </div>
+
+                                            </pre>
+                                        )}
+                                    </div>
+                                </div>
+
+                            )
+
+                    }
+
                 </div>
             </div>
         </div>
