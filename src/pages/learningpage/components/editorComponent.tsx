@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import OurEditor from "../../../components/editor";
+import OurEditor, { languageIdToMonacoLanguage } from "../../../components/editor";
 import { IoMdRefresh } from "react-icons/io";
 import styles from '../learning.module.css';
 
@@ -12,13 +12,16 @@ interface ExecutionResult {
     memoryUsage?: number;
 }
 
-const EditorComponent = () => {
+
+const EditorComponent = ({languageId} : {languageId: number}) => {
     const [code, setCode] = useState('# Write your code here');
 
     const [activeTab, setActiveTab] = useState<"input" | "output">("input")
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<ExecutionResult | null>(null);
-    const [codeInput, setCodeInput] = useState("");
+    const [codeInput, setCodeInput] = useState(""); 
+    const monacoLanguage = languageIdToMonacoLanguage[languageId] || 'plaintext';
+
 
     const handleCodeChange = (newCode: string | undefined) => {
         if (newCode !== undefined) {
@@ -43,7 +46,7 @@ const EditorComponent = () => {
             const token = localStorage.getItem("access_token");
             const body = {
                 code,
-                language_id: 91,
+                language_id: languageId,
                 stdin: codeInput,
                 userToken: token  // pass it here if needed
             };
@@ -55,8 +58,6 @@ const EditorComponent = () => {
                         "Content-Type": "application/json"
                     }
                 });
-
-            console.log(response);
 
             setResult(
                 {
@@ -78,19 +79,16 @@ const EditorComponent = () => {
     }
 
 
-
-
-
-
     return (
         <div className={styles.codeEditorContainer}>
             <div className={styles.editorSection}>
                 <OurEditor
                     value={code}
                     onChange={handleCodeChange}
-                    language="java"
+                    language={monacoLanguage || "javascript"}
                     theme="vs-dark"
                 />
+
 
                 <div className={styles.editorBottom}>
                     <div>
@@ -102,6 +100,7 @@ const EditorComponent = () => {
                             <IoMdRefresh />
                         </button>
 
+            
                         <button
                             className={`${styles.switchButtons} ${activeTab === 'input' ? styles.active : ""}`}
 
@@ -140,6 +139,7 @@ const EditorComponent = () => {
                                     <textarea className={styles.editorInputFeild}
                                         value={codeInput}
                                         onChange={(e) => { setCodeInput(e.target.value) }}
+                                        placeholder='Enter your input here'
                                     />
                                 </div>
                             )

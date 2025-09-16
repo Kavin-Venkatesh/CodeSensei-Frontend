@@ -1,0 +1,73 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  /* background: rgba(158, 157, 157, 0.6); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: transparent;
+  width: 100%;
+  border-radius: 10px;
+  /* box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); */
+  animation: fadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 1rem;
+  background-color: var(--editor-style);
+  color : var(--text-inverse);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 15px;
+
+}
+
+.closeBtn {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.content {
+  padding: 1rem;
+  color: #333;
+}
+
+
+.actionBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.actionBtn:hover {
+  background: #0056b3;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

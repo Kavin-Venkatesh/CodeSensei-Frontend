@@ -1,14 +1,37 @@
+import { useRef, useState } from "react";
 import LeftContainer from "./leftContainer/index.js";
 import RightContainer from  "./rightContainer/index.js"
 import styles from "./assessPanel.module.css";
+import type React from "react";
 
-const AssessPanel = () =>{
+
+interface Sample {
+    input: string,
+    output: string,
+    explanation : string
+}
+interface Question {
+    title: string,
+    difficulty_level : string,
+    description: string,
+    samples: Sample[]
+}
+
+
+interface AssessPanelProps{
+    generatedQuestion : Question,
+    languageId : number
+}
+
+
+const AssessPanel : React.FC<AssessPanelProps> = ({generatedQuestion, languageId}) =>{
+
     return(
         <div className = {styles.assessmentMainContainer}>
 
-            <LeftContainer />
-            <RightContainer />
-            
+            <LeftContainer generatedQuestion={generatedQuestion} />
+            <RightContainer languageId={languageId} />
+
         </div>
     )
 }

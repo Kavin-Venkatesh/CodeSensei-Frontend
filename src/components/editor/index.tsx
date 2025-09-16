@@ -11,10 +11,24 @@ interface EditorProps {
     theme? : string;
 }
 
+export const languageIdToMonacoLanguage: Record<number, string> = {
+  109: 'python',       // Python (3.8.1)
+  63: 'javascript',   // JavaScript (Node.js 12.14.0)
+  91: 'java',         // Java (OpenJDK 13.0.1)
+  54: 'cpp',          // C++ (GCC 9.2.0)
+  50: 'c',            // C (GCC 9.2.0)
+  51: 'csharp',       // C# (Mono 6.6.0.161)
+  68: 'php',          // PHP (7.4.1)
+  72: 'ruby',         // Ruby (2.7.0)
+  60: 'go',           // Go (1.13.5)
+  74: 'typescript',   // TypeScript (3.7.4)
+};
+
 
 loader.config({ monaco });
 
 const OurEditor = ({value = "",language , onChange , readOnly = false, theme = "vs-dark"} : EditorProps) =>{
+
     return(
         <Editor 
             value = {value}

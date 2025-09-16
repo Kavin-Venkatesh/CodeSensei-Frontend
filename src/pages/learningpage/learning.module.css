@@ -1,11 +1,12 @@
 .learningMainContainer{
     display: flex;
     flex-direction: column;
-    background-color: #f9f9f9;
+    background-color: aliceblue;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+    align-items: center;
     scrollbar-width: thin;
     scrollbar-color: #888 #f9f9f9;
 }
@@ -119,6 +120,11 @@
 
 }
 
+.selectedTopic{
+    font-weight: bold;
+    color: var(--primary);
+}
+
 
 .learningPathItem:hover{
     background-color: var(--primary-hover);
@@ -225,28 +231,6 @@
 }
 
 
-.learningContentBody::-webkit-scrollbar {
-    width: 8px;
-}
-.learningContentBody::-webkit-scrollbar-track {
-    background: var(--background-alt);
-}
-.learningContentBody::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 10px;
-}
-
-/* .editorSection{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    height: 100%;
-    background-color: var(--background-alt);
-    padding: 1rem;
-    border-radius: 10px;
-} */
 
 .codeEditorContainer{
     display: flex;
@@ -254,6 +238,13 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
+}
+
+.codeEditorContainer:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .editorSection {
@@ -269,8 +260,6 @@
     align-items: center;
     color: white;
 }
-
-
 
 .runButton {
     background-color: var(--secondary);
@@ -434,6 +423,47 @@
 }
 
 
+.spinnerContainer {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  margin: 30px auto;
+  overflow: hidden;
+}
+
+.spinner {
+  position: absolute;
+  width: calc(100% - 9.9px);
+  height: calc(100% - 9.9px);
+  border: 5px solid transparent;
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 5s cubic-bezier(0.17, 0.49, 0.96, 0.79) infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingOverlay{
+    position : absolute;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    width : 100%;
+    height : 100%;
+    background-color: transparent;
+    z-index: 1000;
+    cursor: not-allowed;
+}
+
 .outputContainer {
   display: flex;
   flex-direction: column;
@@ -497,6 +527,173 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+
+.questionGenerationContainer{
+    width: 96%;
+    border-radius: 10px;
+    padding : 1rem;
+    margin : 0 0 1rem 0;
+    background-color: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.questionGenerationContainer p{
+    font-size: 1.45rem;
+    font-weight: bold;
+}
+
+.generateQuestionButton{
+    width : 15rem;
+    padding: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border : none;
+    background : linear-gradient(180deg , var(--primary), var(--background-alt));
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.generateQuestionButton:active{
+    transform: scale(0.98);
+}
+
+.generateAIImage{
+    font-size: 1.1rem;
+}
+
+.imageContainers{
+    width: 30%;
+    height: 15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* background-color: #007bff; */
+}
+
+.imageContainersTitle{
+    font-size: larger;
+    font-weight: bold;
+    color: var(--text-inverse);
+}
+
+.modalImagesContainer{
+    width: 100%;
+    height : 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.selectedDifficulty {
+    width: 30%;
+    height: 100%;
+    border-radius: 40px;
+    background-color: var(--accent-dark);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.modalImageContainer{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-alt);
+    border-radius: 40px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.modalImageContainerImg{
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+}
+
+.modalImageContainer:hover{
+    transform: scale(1.05);
+}
+
+.modalConfirmDifficulty{
+    width: 10rem;
+    padding: 1rem;
+    border : none;
+    border-radius: 10px;
+    margin: 2rem 0 0 46rem;
+    background: linear-gradient(90deg , var(--accent) , var(--accent-light));
+    color: var(--text);
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modalConfirmDifficulty:active{
+    transform: scale(0.95);
+}
+
+.learningNavigation{
+    width : 95%;
+    height: 100%;
+    display: flex;
+    align-items : center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.nextTopicNavigation,
+.previousTopicNavigation{
+    display: flex;
+    width: 10%;
+    padding: 1rem;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: 1rem;
+    font-weight: 700;
+    border :none;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    color: var(--text-inverse);
+    background: linear-gradient(180Deg , var(--primary-dark) , var(--primary-light));
+    border-radius: 10px;
+}
+
+
+
+
+
+.topicCompletion{
+    display: flex;
+    width: 15%;
+    padding: 1rem;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: 1rem;
+    border :none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.3s ease;
+    color: var(--text-inverse);
+    background: linear-gradient(180Deg , var(--secondary) , var(--primary-light));
+    border-radius: 10px;
+}
+
+.previousTopicNavigation:active,
+.nextTopicNavigation:active,
+.topicCompletion:active{
+    transform: scale(0.98);
+}
+
+
+
+.navigationIcons{
+    font-size: 1.4rem;
 }
 
 
