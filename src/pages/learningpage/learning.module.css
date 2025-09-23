@@ -20,7 +20,7 @@
     align-items: center;
     justify-content: flex-start;
     padding: 0 30px;
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 100;
     margin : 0 0 0 0;
@@ -67,6 +67,7 @@
     top: 0;
     left: 0;
     z-index: 10;
+    margin : 2.5rem 0 0 1rem;
     border-radius: 10px;
     transition: transform 0.3s ease;
     overflow-x: hidden;
@@ -83,10 +84,8 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    /* padding: 10px; */
     margin-bottom: 1rem;
     border-radius: 10px;
-
     border-bottom: 2px solid var(--primary);
     background-color: var(--primary);
 }
@@ -166,6 +165,7 @@
     justify-content: flex-start;
     width: 100%;
     height: 70vh;
+    margin: 2rem 1rem 0 0;
     background-color: var(--background-alt);
     padding: 1rem;
     border-radius: 10px
@@ -173,7 +173,6 @@
 .learningContentHeader{
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
     padding: 5px;
     margin-bottom: 1rem;
@@ -701,15 +700,96 @@
 @media (max-width: 768px) {
     .learningPath {
         width: 80vw;
-        height: auto;
+        height: 100vh;
         position: fixed;
+        overflow-x: hidden;
+        overflow-y:auto;
         top: 70px;
         left: 0;
         right: 0;
         margin: 0 auto;
         transition: transform 0.3s ease-in-out;
     }
-}
 
+    .learningNavbar h1{
+        font-size: 1.5rem;
+        margin: 0 0 0 1rem;
+    }
+
+    .learningPathItem{
+        font-size: 1rem;
+    }
+
+    .contentMainContainer{
+        width: 100%;
+        height: auto;
+        padding: 0.5rem;
+    }
+
+    .learningContentHeader h3{
+        font-size: 1rem;
+    }
+
+    .questionGenerationContainer p{
+        font-size: 1.2rem;
+    }
+
+    .readAloudButton{
+        padding:0.8rem;
+        font-size: 0.8rem;
+        border-radius:10px;
+    }
+
+    .generateQuestionButton{
+         width : 10rem;
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .modalImagesContainer{
+        flex-direction: column;
+        height: auto;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .modalConfirmDifficulty{
+        margin:  0 0 0 10rem;
+    }
+
+    .imageContainers{
+        width: 50%;
+        height: 14rem;
+    }
+
+    .modalImageContainerImg{
+        width: 80%;
+        height: 80%;
+    }
+
+    .imageContainersTitle{
+        font-size: medium;
+        font-weight: lighter;
+    }
+
+    .InputOutputContainer{
+        height : 100%;
+    }
+
+    .outputContainer{
+        max-height: 200px;   /* or vh based */
+    }
+   
+    .previousTopicNavigation,
+    .nextTopicNavigation,
+    .topicCompletion{
+        width: 40%;
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+
+
+
+}
 
 

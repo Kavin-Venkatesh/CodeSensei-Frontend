@@ -125,5 +125,50 @@
 
 
 
+@media (max-width: 768px) {
+    .assessmentMainContainer{
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 
+    .assessLeftContainer{
+        width : 90vw;
+        height: auto;
+        margin : 1rem 0 0 0;
+    }
+
+    .assessRightContainer{
+        width: 90vw;
+        margin : 1rem 0 1rem 0;
+    }
+
+    .assessQuestionHeader h1{
+        font-size: 1.5rem;
+        margin : 0 0 0 0;
+    }
+
+    .SampleInputOutputContainer{
+        width : 100%;
+        margin: 0.5rem 0 0 0;
+        padding : 0.5rem;
+        border-left: 0px solid #535151;
+    }
+
+    .SampleInputOutputContainer p{
+        font-size : 1rem;
+        margin : 0 0 0 0.5rem;
+    }
+
+    .assessQuestionDescription{
+        width: 100%;
+        margin: 0 0 0 0;
+        padding: 0.5rem;
+    }
+    .assessSampleContainer{
+        width: 100%;
+        margin: 0 0 0 0;
+    }
+
+}
 

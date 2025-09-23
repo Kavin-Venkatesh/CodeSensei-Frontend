@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homepage";
 import LearningPage from "./pages/learningpage";
+
+
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem("access_token");
   return token ? <>{children}</> : <Navigate to="/login" replace />;
@@ -14,7 +16,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         
-        <Route
+        <Route  
           path="/home/:id"
           element={
             <PrivateRoute>
@@ -31,16 +33,6 @@ const App: React.FC = () => {
             </PrivateRoute>
           }
         />
-
-        
-        {/* <Route
-          path="/home"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        /> */}
       </Routes>
     </BrowserRouter>
   );

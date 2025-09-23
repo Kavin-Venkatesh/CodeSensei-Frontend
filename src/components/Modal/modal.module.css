@@ -71,3 +71,36 @@
     transform: translateY(0);
   }
 }
+
+
+@media (max-width: 768px) {
+  .overlay {
+    align-items: flex-start; /* reset vertical centering */
+    justify-content: flex-start; /* reset horizontal centering */
+  }
+
+  .modal {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0; /* remove rounding for full screen */
+  }
+
+  .header {
+    border-radius: 0; /* remove rounding for full screen */
+    width: 100vw;
+    justify-content: space-around;
+  }
+
+  .content{
+    width: 80vw;
+  }
+
+  .header h1{
+    font-size : 1.2rem;
+  }
+
+  .closeBtn{
+    font-size: 1.2rem;
+  }
+}
+

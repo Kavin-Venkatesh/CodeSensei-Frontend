@@ -1,8 +1,6 @@
-import { useRef, useState } from "react";
 import LeftContainer from "./leftContainer/index.js";
 import RightContainer from  "./rightContainer/index.js"
 import styles from "./assessPanel.module.css";
-import type React from "react";
 
 
 interface Sample {
