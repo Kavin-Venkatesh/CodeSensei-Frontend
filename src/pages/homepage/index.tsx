@@ -7,17 +7,27 @@ import styles from "./Homepage.module.css";
 import Title from "../../assets/Title.png";
 import DefaultProfile from "../../assets/CodeSensei_Logo.png";
 import { VscFoldDown } from "react-icons/vsc";
+import { FaCode } from "react-icons/fa";
 
 interface Course {
-    course_id: number;
-    course_title: string;
-    description?: string;
-    course_language?: string;
-    data?: [
-        courses?: Course[]
-    ];
-
+    course_id: number,
+    course_title: string,
+    description?: string,
+    course_language?: string
+    language_id?: number
+    total_topics?: number
+    completed_topics?: number
+    progress?: number
 }
+
+interface CourseApiResponse {
+    data: {
+        courses: Course[]
+    }
+    message: string
+    status: string
+}
+
 
 const Homepage: React.FC = () => {
     const [imageError, setImageError] = useState(false);
@@ -25,10 +35,9 @@ const Homepage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
-
     const navigate = useNavigate();
-        
-    
+
+
     const storedUser = localStorage.getItem("user");
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -38,12 +47,12 @@ const Homepage: React.FC = () => {
     const fetchCourses = async () => {
         setIsLoading(true);
         setError('');
-        
+
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
-            
-            const response = await axios.get<Course[]>(`${backendUrl}/api/courses`, {
+
+            const response = await axios.get<CourseApiResponse>(`${backendUrl}/api/courses`, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...(accessToken && {
@@ -51,7 +60,7 @@ const Homepage: React.FC = () => {
                     })
                 }
             });
-            
+
             setCourses(response.data.data.courses);
         } catch (err) {
             console.error('Error fetching courses:', err);
@@ -68,7 +77,7 @@ const Homepage: React.FC = () => {
             } else {
                 setError('An unexpected error occurred');
             }
-            
+
             // Fallback to default courses if API fails
             setCourses([
                 { course_id: 1, course_title: "Python", description: "Learn Python programming from scratch" },
@@ -103,9 +112,12 @@ const Homepage: React.FC = () => {
         setDropdownOpen(!dropdownOpen);
     };
 
-    const handleLearningNavigation = (course_id : number) =>{
-        console.log("Navigating to course ID:", course_id);
+    const handleLearningNavigation = (course_id: number) => {
         navigate(`/learning/${course_id}`);
+    }
+
+    const handleCompilerNavigation = () => {
+        navigate('/compiler')
     }
 
 
@@ -113,77 +125,83 @@ const Homepage: React.FC = () => {
         <div className={styles.homeMainContainer}>
             {/* Navbar Section */}
             <div className={styles.homeNavbar}>
-                <img src={Title} alt="CodeSensei Logo" className={styles.logo} />
+                <div className={styles.pageNavigationContainer}>
+
+                    <img src={Title} alt="CodeSensei Logo" className={styles.logo} />
+
+                    <button className={styles.editorNavigationButton}
+                        onClick={handleCompilerNavigation}
+                    > 
+                        Complier
+                        <FaCode />
+                    </button>
+
+
+                </div>
 
                 <div className={styles.profileSection}>
-                   <div className={styles.profileDropdown}>
-                        <button 
+                    <div className={styles.profileDropdown}>
+                        <button
                             className={styles.profileButton}
                             onClick={handleDropDownToggle}
                         >
-                             <img
-                        src={imageError ? DefaultProfile : profileImageUrl}
-                        alt={user?.name || "Profile"}
-                        className={styles.profileImage}
-                        crossOrigin="anonymous"
-                        referrerPolicy="no-referrer"
-                        onLoad={() => {
-                            setImageError(false);
-                        }}
-                        onError={() => {
-                            setImageError(true);
-                        }}
-                    />
-                    </button>
-                    
-                    {dropdownOpen && (
-                        <div className={styles.dropdownMenu}>
-                            <button 
-                                className={styles.dropdownItem}
-                                onClick={() => {
+                            <img
+                                src={imageError ? DefaultProfile : profileImageUrl}
+                                alt={user?.name || "Profile"}
+                                className={styles.profileImage}
+                                crossOrigin="anonymous"
+                                referrerPolicy="no-referrer"
+                                onLoad={() => {
+                                    setImageError(false);
+                                }}
+                                onError={() => {
+                                    setImageError(true);
+                                }}
+                            />
+                        </button>
 
-                                    setDropdownOpen(false);
-                                }}
-                            >
-                                Profile
-                            </button>
-                            <button 
-                                className={styles.dropdownItem}
-                                onClick={() => {
-                                    // Handle logout
-                                    localStorage.removeItem("user");
-                                    localStorage.removeItem("access_token");
-                                    setDropdownOpen(false);
-                                    navigate('/');
-                                }}
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    )}
-                   </div>
+                        {dropdownOpen && (
+                            <div className={styles.dropdownMenu}>
+                                <button
+                                    className={styles.dropdownItem}
+                                    onClick={() => {
+
+                                        setDropdownOpen(false);
+                                    }}
+                                >
+                                    Profile
+                                </button>
+                                <button
+                                    className={styles.dropdownItem}
+                                    onClick={() => {
+                                        // Handle logout
+                                        localStorage.removeItem("user");
+                                        localStorage.removeItem("access_token");
+                                        setDropdownOpen(false);
+                                        navigate('/');
+                                    }}
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-    
-            
+
+
             <Carousel />
 
-            
+
             <div className={styles.welcomeMessage}>
                 <h1>Welcome {user?.name || ""}</h1>
-                
+
                 <VscFoldDown className={styles.dropDownIcon} />
             </div>
-            
+
             <div className={styles.languageSection}>
                 <p>Your journey to master programming starts here.</p>
-                {/* <button 
-                    className={styles.refreshButton}
-                    onClick={fetchCourses}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Loading...' : 'Refresh Courses'}
-                </button> */}
+
             </div>
 
             <div className={styles.courseContainer}>
@@ -193,7 +211,7 @@ const Homepage: React.FC = () => {
                         <p>Loading courses...</p>
                     </div>
                 )}
-                
+
                 {!isLoading && !error && courses.length === 0 && (
                     <div className={styles.noCoursesContainer}>
                         <p>No courses available at the moment.</p>
@@ -204,15 +222,30 @@ const Homepage: React.FC = () => {
                     return (
                         <div className={styles.courseCard} key={course.course_id}>
                             <h3>{course.course_title}</h3>
-                                {course.description && (
-                                    <p className={styles.courseDescription}>{course.description}</p>
-                                )}
-                            <button 
-                                className={styles.enrollButton} 
-                                onClick={() => handleLearningNavigation(course.course_id)}
-                            >
-                                Start Learning
-                            </button>
+                            {course.description && (
+                                <p className={styles.courseDescription}>{course.description}</p>
+                            )}
+
+                            <div>
+                                <div className={styles.progressBarContainer}>
+                                    <div
+                                        className={styles.progressBar}
+                                        style={{ width: `${course.progress}%` }}
+                                    ></div>
+                                </div>
+                                <p className={styles.progressText}>{course.progress || 0}% completed</p>
+
+                                <button
+                                    className={styles.enrollButton}
+                                    onClick={() => handleLearningNavigation(course.course_id)}
+                                >
+                                    Start Learning
+                                </button>
+
+
+                            </div>
+
+
                         </div>
                     );
                 })}

@@ -3,11 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homepage";
 import LearningPage from "./pages/learningpage";
+import CompilerPage from "./pages/compiler";
 
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem("access_token");
-  return token ? <>{children}</> : <Navigate to="/login" replace />;
+  return token ? <>{children}</> : <Navigate to="/" replace />;
 };
 
 const App: React.FC = () => {
@@ -15,7 +16,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        
+
         <Route  
           path="/home/:id"
           element={
@@ -33,6 +34,16 @@ const App: React.FC = () => {
             </PrivateRoute>
           }
         />
+
+
+        <Route path="/compiler"
+          element={
+            <PrivateRoute>
+              <CompilerPage />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

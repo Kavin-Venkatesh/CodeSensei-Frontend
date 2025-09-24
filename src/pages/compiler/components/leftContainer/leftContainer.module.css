@@ -1,0 +1,87 @@
+.compilerLeftContainer{
+    display: flex;
+    flex-direction: column;
+    width: 12%;
+    height: 99%;
+    background-color: var(--background-alt);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin : 0 0 0 0.5rem;
+    border-radius: 10px;
+}
+
+.compilerLeftContainerHeader{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+}
+
+.compilerLeftContainerHeader h1{
+    font-size: larger;
+}
+
+.addQuestionsButton{
+    width: 90%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    border-radius: 8px;
+    color: white;
+    background-color: var(--primary);
+    font-size: large;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.compilerLeftContainerBody{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 90%;
+    overflow-y: auto;
+}
+
+
+.questionsList{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.questionsListItems{
+    width: 35%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--text);
+    background-color: var(--background-alt);
+    font-size: medium;
+    border: none;
+    font-weight: bold;
+    border : 2px solid var(--primary);
+    cursor: pointer;
+    margin : 0.5rem;
+    user-select: none;
+}
+
+.questionsListItems:hover{
+    background-color: var(--primary);
+    color: white;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+.questionsListItems:active{
+    transform: scale(0.95);
+    transition: all 0.1s ease-in-out;
+}
+
+

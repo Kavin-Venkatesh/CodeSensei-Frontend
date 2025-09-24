@@ -1,0 +1,16 @@
+.compilerMainContainer{
+    display: flex;
+    padding: 0;
+    top: 0;
+    margin: 0;
+    height: 98vh;
+    overflow: hidden;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: aliceblue;
+}
+
+
+
+
