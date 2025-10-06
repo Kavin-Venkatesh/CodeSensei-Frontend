@@ -12,6 +12,7 @@ import { IoMenuSharp } from "react-icons/io5";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { GrCaretPrevious } from "react-icons/gr";
 import { GrCaretNext } from "react-icons/gr";
+import { toast, ToastContainer } from "react-toastify";
 
 import Beginner from "../../assets/basic.png"
 import Intermediate from "../../assets/intermediate.png"
@@ -19,7 +20,7 @@ import Advanced from "../../assets/advanced.png"
 
 
 import AssessPanel from "./components/AssesPanel";
-import Loading from "../../components/Loading/index.tsx";
+import { Loading } from "../../components/Loading/index.tsx";
 import Modal from "../../components/Modal/index.tsx";
 import MarkdownRenderer from "./components/markdownRenderer";
 
@@ -212,33 +213,78 @@ const LearningPage = () => {
 
     const handleQuestionGeneration = async () => {
         try {
-            setIsGeneratingQuestion(true)
+            setIsGeneratingQuestion(true);
+
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
 
-            const response = await axios.post(`${backendUrl}/api/topics/generate-question`, {
-                topicId: selectedTopic?.topic_id,
-                topicTitle: selectedTopic?.topic_title,
-                difficultyLevel: difficultyLevel
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(accessToken && {
-                        Authorization: `Bearer ${accessToken}`
-                    })
+            const response = await axios.post(
+                `${backendUrl}/api/topics/generate-question`,
+                {
+                    topicId: selectedTopic?.topic_id,
+                    topicTitle: selectedTopic?.topic_title,
+                    difficultyLevel: difficultyLevel,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(accessToken && {
+                            Authorization: `Bearer ${accessToken}`,
+                        }),
+                    },
                 }
-            });
-            console.log(response);
-            setIsModalOpen(false);
-            setIsGeneratingQuestion(false);
-            setQuestion(response.data.data);
-        } catch (err) {
+            );
+
+            // ✅ Success case
+            if (response.status === 200 && response.data.success) {
+                setQuestion(response.data.data);
+                setIsModalOpen(false);
+                toast.success("🎯 Question generated successfully!", {
+                    position: "top-right",
+                    autoClose: 2500,
+                });
+            } else {
+                // ⚠️ Unexpected success structure
+                toast.warn(response.data.message || "Unexpected response from server", {
+                    position: "top-right",
+                });
+            }
+
+        } catch (err: any) {
             console.error("Error generating question:", err);
             setIsModalOpen(false);
+
+            let errorMessage = "Something went wrong. Please try again later.";
+
+            // 🧠 Detailed error mapping
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    const status = err.response.status;
+
+                    if (status === 400) {
+                        errorMessage = "❗ Missing required fields. Please check your input.";
+                    } else if (status === 401) {
+                        errorMessage = "🔒 Unauthorized. Please log in again.";
+                    } else if (status === 429) {
+                        errorMessage = "🚫 Generation limit reached for this topic. Try again later.";
+                    } else if (status >= 500) {
+                        errorMessage = "💥 Server error while generating question. Please retry later.";
+                    } else {
+                        errorMessage = err.response.data?.message || "⚠️ Unexpected error occurred.";
+                    }
+                } else {
+                    errorMessage = "🌐 Network error. Please check your internet connection.";
+                }
+            }
+
+            toast.error(errorMessage, {
+                position: "top-right",
+                autoClose: 3000,
+            });
         } finally {
-            setIsGeneratingQuestion(false)
+            setIsGeneratingQuestion(false);
         }
-    }
+    };
 
     const handlePreviousTopic = () => {
         if (!selectedTopic || learningPath.length === 0) return;
@@ -257,83 +303,105 @@ const LearningPage = () => {
             setSelectedTopic(learningPath[currentIndex + 1]);
         }
 
-        
+
     };
 
 
     const handleMarkAsCompleted = async () => {
-        if (!selectedTopic) return;
+        if (!selectedTopic) {
+            toast.warn("⚠️ No topic selected", { autoClose: 2000 });
+            return;
+        }
 
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
 
-            await axios.put(`${backendUrl}/api/topics/mark-completed/${selectedTopic.topic_id}`, {
-                is_completed: 1
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(accessToken && {
-                        Authorization: `Bearer ${accessToken}`
-                    })
+            const response = await axios.put(
+                `${backendUrl}/api/topics/mark-completed/${selectedTopic.topic_id}`,
+                { is_completed: 1 },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+                    },
                 }
-            });
-
-            setLearningPath(prev =>
-                prev.map(topic =>
-                    topic.topic_id === selectedTopic.topic_id
-                        ? { ...topic, is_completed: 1 } // ✅ set to 1
-                        : topic
-                )
             );
 
+            if (response.status === 200 && response.data.success) {
+                setLearningPath(prev =>
+                    prev.map(topic =>
+                        topic.topic_id === selectedTopic.topic_id
+                            ? { ...topic, is_completed: 1 }
+                            : topic
+                    )
+                );
 
-            const currentIndex = learningPath.findIndex(
-                topic => topic.topic_id === selectedTopic.topic_id
-            );
-            if (currentIndex < learningPath.length - 1) {
-                setSelectedTopic(learningPath[currentIndex + 1]);
+                const currentIndex = learningPath.findIndex(
+                    topic => topic.topic_id === selectedTopic.topic_id
+                );
+                if (currentIndex < learningPath.length - 1) {
+                    setSelectedTopic(learningPath[currentIndex + 1]);
+                }
+
+                toast.success("✅ Topic marked as completed!", { autoClose: 2000 });
+            } else {
+                toast.warn(response.data.message || "⚠️ Could not mark as completed", { autoClose: 2000 });
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error marking topic as completed:", err);
 
-        }
-    }
+            let errorMsg = "💥 Failed to mark topic as completed";
+            if (axios.isAxiosError(err) && err.response?.data?.message) {
+                errorMsg = err.response.data.message;
+            }
 
+            toast.error(errorMsg, { autoClose: 3000 });
+        }
+    };
     const handleResetTopics = async () => {
         try {
-
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
 
             const courseId = id;
-            
+
             if (!courseId) {
-                console.error("Course ID is missing. Cannot reset topics.");
+                toast.error("⚠️ Course ID missing. Cannot reset topics.", { autoClose: 2000 });
                 return;
             }
 
-            await axios.put(`${backendUrl}/api/topics/reset-topics/${id}`, {}, {
-                headers: {
-                    'Content-Type': 'application/json',
-
-                    ...(accessToken && {
-                        Authorization: `Bearer ${accessToken}`
-                    })
+            const response = await axios.put(
+                `${backendUrl}/api/topics/reset-topics/${id}`,
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+                    },
                 }
-            });
-            // Reset local state
-            setLearningPath(prev => prev.map(topic => ({ ...topic, is_completed: 0 })));
-            if (learningPath.length > 0) {
-                setSelectedTopic(learningPath[0]);
-            } else {
-                setSelectedTopic(null);
-            }
-        } catch (err) {
-            console.error("Error resetting topics:", err);
-        }
+            );
 
-    }
+            if (response.status === 200 && response.data.success) {
+                setLearningPath(prev => prev.map(topic => ({ ...topic, is_completed: 0 })));
+                if (learningPath.length > 0) setSelectedTopic(learningPath[0]);
+                else setSelectedTopic(null);
+
+                toast.success("🔄 Course progress reset successfully!", { autoClose: 2000 });
+            } else {
+                toast.warn(response.data.message || "⚠️ Could not reset course progress", { autoClose: 2000 });
+            }
+        } catch (err: any) {
+            console.error("Error resetting topics:", err);
+
+            let errorMsg = "💥 Failed to reset topics";
+            if (axios.isAxiosError(err) && err.response?.data?.message) {
+                errorMsg = err.response.data.message;
+            }
+
+            toast.error(errorMsg, { autoClose: 3000 });
+        }
+    };
 
     return (
         <div className={styles.learningMainContainer}>
@@ -389,7 +457,7 @@ const LearningPage = () => {
                                     );
                                 })}
 
-                                <button 
+                                <button
                                     className={styles.resetButton}
                                     onClick={handleResetTopics}
                                 >
@@ -416,7 +484,7 @@ const LearningPage = () => {
                             </div>
 
                             <div className={styles.learningContentBody}>
-                                <MarkdownRenderer content={topicData?.content.ai_content || "Loading..."} />
+                                <MarkdownRenderer content={topicData?.content.ai_content || "Please Wait While Fetching Contents"} />
                             </div>
                         </div>
                     </div>
@@ -523,8 +591,8 @@ const LearningPage = () => {
                                 learningPath.findIndex(t => t.topic_id === selectedTopic.topic_id) ===
                                 learningPath.length - 1 ||
                                 !selectedTopic.is_completed // ✅ block until completed
-                            }                        
-                            >
+                            }
+                        >
                             Next Topic
                             <GrCaretNext className={styles.navigationIcons} />
                         </button>
@@ -541,6 +609,7 @@ const LearningPage = () => {
 
                 </>
                 )}
+            <ToastContainer theme="dark" />
         </div>
     )
 }

@@ -46,13 +46,29 @@
 }
 
 
-.questionsList{
+.questionsList {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    overflow-y: auto;    
+    overflow-x: hidden; 
 }
+
+.questionsList::-webkit-scrollbar {
+    width: 6px; /* vertical scrollbar width */
+}
+
+.questionsList::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 3px;
+}
+
+.questionsList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 
 .questionsListItems{
     width: 35%;
@@ -85,3 +101,57 @@
 }
 
 
+.modalMainContainer{
+    width: 49vw;
+    height: 50vh;
+    background-color: black;
+    color: var(--text-inverse);
+    border-radius: 10px;
+}
+
+
+.modalHeader{
+    width: 100%;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content : flex-end;
+}
+
+
+.copyButton{
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 10px;
+    border : none;
+    margin: 1rem;
+}
+
+
+.copyButton:active{
+    transform: scale(0.95);
+}
+
+
+.questionContainer{
+    width: 100;
+}
+
+
+
+/* ✅ submitted question */
+.submitted {
+  background-color:var(--success);
+  color: white;
+}
+
+/* ✅ currently selected */
+.selected {
+  background-color: var(--primary);
+  color: white;
+}

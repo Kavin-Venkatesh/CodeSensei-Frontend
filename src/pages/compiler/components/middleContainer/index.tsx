@@ -1,10 +1,15 @@
 import styles from './middleContainer.module.css';
+import { useQuestionContext } from '../../contextAPI';
 
 import { FaLessThan } from "react-icons/fa";
 import { FaGreaterThan } from "react-icons/fa";
 
 
 const MiddleContainer = () => {
+
+    const {currentQuestion , submitQuestion , nextQuestion , previousQuestion} = useQuestionContext();
+
+    if(!currentQuestion) return <div>Loading</div>
 
     const generatedQuestion = {
     title: "Grade Calculator",
@@ -34,34 +39,42 @@ const MiddleContainer = () => {
             <div className={styles.questionContainer}>
                 <div className={styles.questionHeader}>
                     <h1>
-                        {generatedQuestion?.title}
+                        {currentQuestion.question_title}
                     </h1>
 
                     <div className={styles.questionNavigationContainer}>
-                        <button className={styles.previousButton}> <FaLessThan /> </button>
-                        <button className={styles.nextButton}> <FaGreaterThan /> </button>
+                        <button className={styles.previousButton}
+                            onClick={previousQuestion}
+                        > <FaLessThan /> </button>
+                        <button className={styles.nextButton}
+                            onClick={nextQuestion}
+                        > <FaGreaterThan /> </button>
                     </div>
                 </div>
 
                 <div className={styles.questionDescription}>
-                    <p> {generatedQuestion?.description}</p>
+                    <p> {currentQuestion.question_description}</p>
                 </div>
 
 
                 <div className={styles.sampleContainer}>
                     <h2>Sample Input and Output</h2>
+                    
+                    <div className={styles.sampleInputOutputContainer}>
+                                <h3>Example </h3>
+                                <p> <span>Input  : </span>{ currentQuestion.sample_input}</p>
+                                <p> <span>Output  : </span> {currentQuestion.sample_output}</p>
+                                <p> <span>Explanation  : </span> {currentQuestion.explanation}</p>
+                    </div>
 
-                    {
-                        generatedQuestion?.samples.map((sample, id) => (
-                            <div className={styles.sampleInputOutputContainer} key={id}>
-                                <h3>Example {id + 1} </h3>
-                                <p> <span>Input  : </span>{sample.input}</p>
-                                <p> <span>Output  : </span> {sample.output}</p>
-                                <p> <span>Explanation  : </span> {sample.explanation}</p>
-                            </div>
-                        ))
-                    }
-
+                <div style={{ marginTop: "20px" }}>
+                    <button
+                    onClick={() => submitQuestion(currentQuestion.question_id)}
+                    style={{ padding: "10px 20px", background: "blue", color: "white", borderRadius: "6px" }}
+                    >
+                    Submit
+                    </button>
+                </div>
                 </div>
 
             </div>

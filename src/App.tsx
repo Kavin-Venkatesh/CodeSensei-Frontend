@@ -4,6 +4,7 @@ import LoginPage from "./pages/login";
 import HomePage from "./pages/homepage";
 import LearningPage from "./pages/learningpage";
 import CompilerPage from "./pages/compiler";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -16,7 +17,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-
+        
         <Route  
           path="/home/:id"
           element={
@@ -36,7 +37,7 @@ const App: React.FC = () => {
         />
 
 
-        <Route path="/compiler"
+        <Route path="/compiler/:id"
           element={
             <PrivateRoute>
               <CompilerPage />

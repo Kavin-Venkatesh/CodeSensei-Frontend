@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+
 import Carousel from "../../components/Carousel/Carousel";
 import styles from "./Homepage.module.css";
 
@@ -39,6 +41,7 @@ const Homepage: React.FC = () => {
 
 
     const storedUser = localStorage.getItem("user");
+    const {id} =  useParams();
     const user = storedUser ? JSON.parse(storedUser) : null;
 
     const profileImageUrl = user?.picture || DefaultProfile;
@@ -62,29 +65,37 @@ const Homepage: React.FC = () => {
             });
 
             setCourses(response.data.data.courses);
+
+            toast.success("Course fetched Successfully!" ,{
+                position : 'top-right',
+                autoClose : 2000
+            })
+
         } catch (err) {
             console.error('Error fetching courses:', err);
-            if (axios.isAxiosError(err)) {
-                if (err.response?.status === 401) {
-                    setError('Authentication failed. Please log in again.');
-                } else if (err.response?.status === 404) {
-                    setError('Courses not found.');
-                } else if (err.response && err.response.status >= 500) {
-                    setError('Server error. Please try again later.');
-                } else {
-                    setError(err.response?.data?.message || err.message || 'Failed to fetch courses');
-                }
-            } else {
-                setError('An unexpected error occurred');
-            }
 
-            // Fallback to default courses if API fails
-            setCourses([
-                { course_id: 1, course_title: "Python", description: "Learn Python programming from scratch" },
-                { course_id: 2, course_title: "Java", description: "Master Java development" },
-                { course_id: 3, course_title: "React JS", description: "Build modern web applications with React" },
-                { course_id: 4, course_title: "Javascript", description: "Essential JavaScript for web development" }
-            ]);
+            let errorMsg = "Error while fetching courses";
+
+             if (axios.isAxiosError(err)) {
+            if (err.response?.status === 401) {
+                errorMsg = 'Authentication failed. Please log in again.';
+            } else if (err.response?.status === 404) {
+                errorMsg = 'Courses not found.';
+            } else if (err.response && err.response.status >= 500) {
+                errorMsg = 'Server error. Please try again later.';
+            } else {
+                errorMsg = err.response?.data?.message || err.message || 'Failed to fetch courses';
+            }
+        }
+
+            setError(errorMsg);
+
+            // ❌ Error Toast
+            toast.error(errorMsg, {
+                position: "top-right",
+                autoClose: 3000,
+            });
+
         } finally {
             setIsLoading(false);
         }
@@ -116,9 +127,9 @@ const Homepage: React.FC = () => {
         navigate(`/learning/${course_id}`);
     }
 
-    const handleCompilerNavigation = () => {
-        navigate('/compiler')
-    }
+     const handleCompilerNavigation = () => {
+        navigate(`/compiler/${id}`);
+    };
 
 
     return (
@@ -250,6 +261,18 @@ const Homepage: React.FC = () => {
                     );
                 })}
             </div>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={4000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+                />
         </div>
     );
 };

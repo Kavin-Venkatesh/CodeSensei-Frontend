@@ -2,6 +2,7 @@
 .compilerRightContainer{
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 48%;
     height: 99%;
     background-color: var(--background-alt);
@@ -15,10 +16,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
+    width : 97%;
 }
 
 .editorContainer{
-     height: 100%;
+    height: 100%;
+    width: 95.5%;
     transition: height 0.4s ease-in-out;
     background-color: var(--editor-style);
     border-radius: 5px;
@@ -27,7 +30,7 @@
 }
 
 .shrinkEditor{
-     height: 60%;
+    height: 40%;
     background-color: var(--editor-style);
     border-radius: 5px;
     margin: 10px 20px 20px 20px;
@@ -70,18 +73,26 @@
   overflow: hidden;
   background: #1e1e1e;
   color: white;
-  padding: 0 10px;
-  transition: height 0.4s ease-in-out, padding 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  width : 95.5%;
+  border-radius : 10px;
 }
 
 .bottomOpen {
-  height: 40%; 
+  height: 60%; 
   padding: 10px;
 }
 
+.consoleButtonContainer{
+  width: 95.5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .consoleButton{
     background-color: var(--accent-dark);
@@ -95,128 +106,230 @@
     font-size: large;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     gap: 5px;
+    margin: 1rem;
 }
 
-.switchButtonsContainer{
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: end;    
-}
-.switchButtons{
-    color: #212529;
-    border: none;
-    padding: 0.8rem 1rem;
+.saveCodeButton{
+    background: linear-gradient( 45deg , var(--accent) , var(--primary-dark));
+    color: var(--text-inverse);
+    width: 7rem;
+    height: 2.5rem;
+    border : none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: large;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    gap: 10px;
-    transition: background-color 0.3s ease-out;
-    margin-right: 1rem;
+    gap: 5px;
 }
 
+.inputAndOutputNavigation{
+  display: flex;
+  width: 100%;
+  height: 3.5em;
+  flex-shrink: 0;
+  flex-grow: 0;
+  align-items: center;
+  background-color: #3a3a3a;
+}
 
-.active{
-    background: var(--accent-dark); /* Blue */
-    color: white;
-    border-color: #007bff;
+.testCaseSwitchButton{
+  width : 10rem;
+  height: 100%;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color : var(--text-light);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: space-evenly;
+  font-weight: lighter;
+}
+
+.testCaseSwitchButton:hover{
+  background-color: #615d5d;
+}
+
+.testCaseSwitchButton span{
+  color: var(--success);
+  font-size: 1.1rem;
+  position: absolute;
+  left : 14px;
+  top : 16px;
+
+}
+
+.activeSwitchButton{
+  background-color: #615d5d;
+  color: var(--text-inverse);
+}
+
+.executionDetailsContainer{
+    display: flex;
+    width: 100%;
+    height: 2.5rem;
+    align-items: center;
+}
+
+.executionDetailsContainer h3{
+    font-size : 2rem;
+    margin: 0.5rem 0 0.5rem 1rem;
+}
+
+.executionDetailsContainer h4{
+    font-size: 1.1rem;
+    font-weight: lighter;
+    margin: 0.5rem 0 0.5rem 5rem;
+}
+.testCaseContainer{
+    display: flex;
+    width: 100%;
+    height: 6em;
+    overflow-y: hidden;
+    overflow-x: auto;
+    align-items: center;
+    -ms-overflow-style: none;
+}
+
+.testCaseContainer::-webkit-scrollbar {
+  display: none;           /* Chrome, Safari, Opera */
+}
+
+.testCase{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+    width : 6rem;
+    height: 3rem;
+    margin : 0.5rem;
+    position: relative;
+    cursor: pointer;
+}
+
+.testCase span{
+  font-size: larger;
+  position: absolute;
+  bottom: 5px;
+  left : 5px;
+  font-size: 4rem;
+}
+
+.activeCase {
+  background-color: #615d5d; 
+  color: white;
+}
+
+.testCaseCloseButton {
+   position: absolute;
+  top: -10px;
+  right: -10px;
+  border: none;
+  background: transparent;
+  color: #aaa;
+  font-size: 18px;
+  cursor: pointer;
+  display: none; /* hidden by default */
+  background-color: #615d5d;
+  border-radius: 10px;
+
+}
+
+/* Show close button only on hover */
+.testCase:hover .testCaseCloseButton {
+  display: block;
+}
+
+.addTestCaseContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    width : 5rem;
+    height: 3rem;
+    flex-shrink: 0;
+    margin : 0.5rem;
+    border: none;
+    color: var(--text-light);
+    background-color: transparent;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.addTestCaseContainer p{
+    font-size: larger;
+}
+
+.addTestCaseContainer:hover{
+  color: var(--text-inverse);
 }
 
 .inputContainer{
-    display: flex;
-    flex-direction: column;
-    height:  10rem; 
-    margin : 0.75rem
-}
-
-.editorInputFeild {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  box-sizing: border-box; /* ✅ include padding & border inside % */
+}
+
+.inputContainer label{
+  font-size: lighter;
+  font-size: 1.1rem;
+  margin: 0 0 0 1em;
+}
+
+.testCaseInputContainer { 
+  width: 80%;
+  height: 3rem;
   resize: none;
-  font-family: monospace;
-  font-size: 14px;
-  border-radius: 6px;
-  background-color: var(--background-alt);
-  color: var(--text);
-  outline : none;
-  border : none;
-  box-shadow: 0 4px 6px rgba(8, 132, 118, 0.1);
-}
-.editorInputFeild:focus{
-  box-shadow: 0 8px 40px rgba(0,230,255,0.08), 0 0 18px rgba(0,230,255,0.12);
-  border-color:var(--accent);
+  background-color: #615d5d;
+  color: var(--text-inverse);
+  border: none;
+  border-radius: 5px;
+  padding:0.8rem;    
+  font-size: 1rem;   
+  margin : 1rem 1rem 1rem 2rem;   
 }
 
-/* placeholder softer */
-.editorInputFeild::placeholder{
-    color:var(--text);
-    font-style:italic
-}
-
-.outputContent {
-  flex: 1;             /* fill available space */
-  overflow-y: auto;    /* ✅ scrolls */
-  padding: 0.5rem;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-}
-
-.consoleSuccess {
-  margin: 0.5rem;
-  font-size: large;
-  color: var(--success); /* greenish for success */
-}
-
-.consoleError {
-  color: var(--error); /* reddish for errors */
-}
-
-.consolePlaceholder {
-  color: #888;
-}
-
-.metaInfo {
-  font-size: 1rem;
-  color: #bbb;
-  display: flex;    
-  margin: 1rem;
+.testCaseInputContainer::placeholder{
+  color: #030202;
 }
 
 
-.loader {
+.passedCase {
+  color: var(--success);
+
+}
+
+.failedCase {
+  color: var(--error);
+}
+
+
+.excecutionDetailsContainer{
+  width: 100%;
+  height: 5rem;
+}
+
+.emptyResultMessage{
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+
 }
 
-.spinnericon {
-  height: 3rem;
-  width: 3rem;
-  animation: spin 1s linear infinite;
-  stroke: rgba(107, 114, 128, 1);
-  margin: 2rem;
-}
-
-.loadingText {
+.emptyResultMessage h1{
   font-size: 2rem;
-  line-height: 1.5rem;
-  font-weight: 800;
-  color: rgba(107, 114, 128, 1);
+  background-color: transparent;
+    background: linear-gradient(90deg, var(--accent-dark), #192bf3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-
-

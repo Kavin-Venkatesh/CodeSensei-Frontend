@@ -1,35 +1,60 @@
 import styles from '../leftContainer/leftContainer.module.css';
+import Modal from '../../../../components/Modal/index';
+import JsonEditor from '../../../../components/jsonEditor';
+
+import { useState } from 'react';
+import { useQuestionContext } from "../../contextAPI/index.tsx";
 
 const LeftContainer = () => {
+
+    const [isModalOpen , setIsModalOpen] = useState(false);
+    const { questions, setCurrentQuestion , currentQuestion} = useQuestionContext();
     return (
         <div className={styles.compilerLeftContainer}>
             <div className={styles.compilerLeftContainerHeader}>
-                <button className={styles.addQuestionsButton}>
+                <button className={styles.addQuestionsButton}
+                    onClick={() => setIsModalOpen(true)}
+                >
                    + Add Question
                 </button>
             </div>
 
+            <Modal
+                isOpen = {isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title='Add Questions'
+                width='50vw'
+                height = '50v'
+            >
+                <div className={styles.modalMainContainer}>                    
+                    <div className={styles.questionContainer}>
+                            <JsonEditor width="900px" height="380px" />
+                    </div>
+                </div>
+            </Modal>
+
 
             <div className={styles.compilerLeftContainerBody}>
-                <h3>Questions List  </h3>
+                <h3>Questions</h3>
                 <div className={styles.questionsList}>
-                    <div className={styles.questionsListItems}>
-                        1
-                    </div>
-                    <div className={styles.questionsListItems}>
-                        2
-                    </div>
 
-                     <div className={styles.questionsListItems}>
-                        3
-                    </div>
-
-                     <div className={styles.questionsListItems}>
-                        4
-                    </div>
-                     <div className={styles.questionsListItems}>
-                        5
-                    </div>
+                    {questions.map((question , index) =>{
+                            const isSelected = currentQuestion?.question_id === question.question_id;
+                            const isSubmitted = question.submitted;
+                        
+                       return(<div  className={
+                            ` ${styles.questionsListItems} 
+                                ${isSubmitted ? styles.submitted : ""} 
+                                ${isSelected ? styles.selected : ""}`
+                        }
+                            key={question.question_id}
+                            onClick={() => setCurrentQuestion(question.question_id)
+                            
+                            }
+                        > 
+                        {index  + 1}
+                        </div> ) 
+                    })}
                 </div>
             </div>
         </div>

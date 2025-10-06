@@ -37,7 +37,7 @@ const Modal: React.FC<ModalProps> = ({
             <div
                 className={styles.modal}
                 style={{ width, height }}
-                onClick={(e) => e.stopPropagation()}  // Prevent closing when clicking inside
+                onClick={(e) => e.stopPropagation()} 
                 >
                 <header className={styles.header}>
                     <h1>{title || "Modal Title"}</h1>

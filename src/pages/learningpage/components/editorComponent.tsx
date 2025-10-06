@@ -3,6 +3,8 @@ import axios from 'axios';
 import OurEditor, { languageIdToMonacoLanguage } from "../../../components/editor";
 import { IoMdRefresh } from "react-icons/io";
 import styles from '../learning.module.css';
+import { OutputLoader } from "../../../components/Loading/index"
+import { toast, ToastContainer } from "react-toastify";
 
 interface ExecutionResult {
     output?: string;
@@ -13,13 +15,13 @@ interface ExecutionResult {
 }
 
 
-const EditorComponent = ({languageId} : {languageId: number}) => {
-    const [code, setCode] = useState('# Write your code here');
+const EditorComponent = ({ languageId }: { languageId: number }) => {
+    const [code, setCode] = useState('');
 
     const [activeTab, setActiveTab] = useState<"input" | "output">("input")
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<ExecutionResult | null>(null);
-    const [codeInput, setCodeInput] = useState(""); 
+    const [codeInput, setCodeInput] = useState("");
     const monacoLanguage = languageIdToMonacoLanguage[languageId] || 'plaintext';
 
 
@@ -30,16 +32,31 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
     };
 
     const handleResetCode = () => {
-        if (code) {
+        if (code.trim()) {
             setCode("");
+            toast.info("Editor reset successfully 🧹", {
+                position: "bottom-right",
+                autoClose: 1500,
+            });
+        } else {
+            toast.warning("Editor is already empty ⚠️", {
+                position: "bottom-right",
+                autoClose: 1500,
+            });
         }
-    }
+    };
 
 
     const handleRun = async () => {
         setLoading(true);
         setActiveTab("output");
         setResult(null);
+
+        toast.info("Please wait while your code is Executing ⏳", {
+            position: "top-right",
+            autoClose: 1000,
+        });
+
 
 
         try {
@@ -48,7 +65,7 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
                 code,
                 language_id: languageId,
                 stdin: codeInput,
-                userToken: token  // pass it here if needed
+                userToken: token
             };
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const response = await axios.post(`${backendUrl}/api/code/execute`, body,
@@ -68,9 +85,40 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
                     memoryUsage: response.data.memoryUsage
                 });
 
+            if (response.data.error) {
+                toast.error("Code execution failed", {
+                    position: "top-right",
+                    autoClose: 2500,
+                });
+            } else {
+                toast.success("Code executed successfully", {
+                    position: "top-right",
+                    autoClose: 2500,
+                });
+            }
+
         } catch (err: any) {
+            let message = "Something went wrong. Please try again later.";
+
+            if (axios.isAxiosError(err)) {
+                if (!err.response) {
+                    message = "Network error — please check your connection 🌐";
+                } else if (err.response.status === 401) {
+                    message = "Unauthorized — please log in again 🔒";
+                } else if (err.response.status >= 500) {
+                    message = "Server error — try again later ⚙️";
+                } else {
+                    message = err.response.data?.error || err.message;
+                }
+            }
+
+            toast.error(message, {
+                position: "top-right",
+                autoClose: 3000,
+            });
+
             setResult({
-                error: err.response?.data?.error || "Something went wrong",
+                error: message,
                 status: "error",
             });
         } finally {
@@ -100,7 +148,7 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
                             <IoMdRefresh />
                         </button>
 
-            
+
                         <button
                             className={`${styles.switchButtons} ${activeTab === 'input' ? styles.active : ""}`}
 
@@ -166,22 +214,7 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
                                             </>
                                         ) : (
                                             <pre className={styles.consolePlaceholder}>
-
-
-                                                <div aria-label="Loading..." role="status" className={styles.loader}>
-                                                    <svg className={styles.spinnericon} viewBox="0 0 256 256">
-                                                        <line x1="128" y1="32" x2="128" y2="64" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="224" y1="128" x2="192" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="128" y1="224" x2="128" y2="192" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="32" y1="128" x2="64" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                        <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
-                                                    </svg>
-                                                    <span className={styles.loadingText}></span>
-                                                </div>
-
+                                                <OutputLoader />
                                             </pre>
                                         )}
                                     </div>
@@ -193,6 +226,7 @@ const EditorComponent = ({languageId} : {languageId: number}) => {
 
                 </div>
             </div>
+            <ToastContainer theme="dark" />
         </div>
     );
 };

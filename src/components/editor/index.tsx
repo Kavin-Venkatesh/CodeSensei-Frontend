@@ -25,6 +25,14 @@ export const languageIdToMonacoLanguage: Record<number, string> = {
 };
 
 
+export const languageNameToId: Record<string, number> = {
+  python: 109,
+  javascript: 63,
+  java: 91,
+  cpp: 54,
+  c: 50,
+};
+
 loader.config({ monaco });
 
 const OurEditor = ({value = "",language , onChange , readOnly = false, theme = "vs-dark"} : EditorProps) =>{
@@ -39,13 +47,13 @@ const OurEditor = ({value = "",language , onChange , readOnly = false, theme = "
             options = {{
                 quickSuggestions: true,
                 parameterHints: { enabled: true },
-                suggestOnTriggerCharacters: false,
+                suggestOnTriggerCharacters: true,
                 tabCompletion: "on",
                 autoClosingBrackets: "languageDefined",
                 readOnly: readOnly,
                 minimap: { enabled: false },
-                fontSize: 16,
-                automaticLayout: true,
+                fontSize: 20,
+                automaticLayout: false,
                 scrollBeyondLastLine: false,
                 theme: theme
             }}

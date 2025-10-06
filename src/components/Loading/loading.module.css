@@ -43,3 +43,34 @@
   justify-content: center;
   align-items: center;
 }
+
+
+
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.spinnericon {
+  height: 3rem;
+  width: 3rem;
+  animation: spin 1s linear infinite;
+  stroke: rgba(107, 114, 128, 1);
+  margin: 2rem;
+}
+
+.loadingText {
+  font-size: 2rem;
+  line-height: 1.5rem;
+  font-weight: 800;
+  color: rgba(107, 114, 128, 1);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
