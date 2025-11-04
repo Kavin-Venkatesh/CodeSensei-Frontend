@@ -129,39 +129,19 @@ const EditorComponent = ({ languageId }: { languageId: number }) => {
 
     return (
         <div className={styles.codeEditorContainer}>
+
+            <div className={styles.editorMainContainer}>
+                    <OurEditor
+                        value={code}
+                        onChange={handleCodeChange}
+                        language={monacoLanguage || "javascript"}
+                        theme="vs-dark"
+                    />
+            </div>
             <div className={styles.editorSection}>
-                <OurEditor
-                    value={code}
-                    onChange={handleCodeChange}
-                    language={monacoLanguage || "javascript"}
-                    theme="vs-dark"
-                />
 
+                <div className={styles.editorButtonContainer}>
 
-                <div className={styles.editorBottom}>
-                    <div>
-                        <button
-                            title='Click to reset the code'
-                            className={styles.resetButton}
-                            onClick={handleResetCode}
-                        >
-                            <IoMdRefresh />
-                        </button>
-
-
-                        <button
-                            className={`${styles.switchButtons} ${activeTab === 'input' ? styles.active : ""}`}
-
-                            onClick={() => setActiveTab("input")}
-                        >
-                            Input Console
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("output")}
-                            className={`${styles.switchButtons} ${activeTab === 'output' ? styles.active : ""}`}
-                        > Output Console</button>
-                    </div>
-                    <div>
                         <button
                             className={styles.runButton}
                             title='Click to run the code '
@@ -173,7 +153,26 @@ const EditorComponent = ({ languageId }: { languageId: number }) => {
                                 :
                                 "Run"}
                         </button>
-                    </div>
+
+                        <button
+                            title='Click to reset the code'
+                            className={styles.resetCodeButton}
+                            onClick={handleResetCode}
+                        >
+                            <IoMdRefresh />
+                        </button>
+                        <button
+                            className={`${styles.switchButtons} ${activeTab === 'input' ? styles.active : ""}`}
+
+                            onClick={() => setActiveTab("input")}
+                        >
+                            Input Console
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("output")}
+                            className={`${styles.switchButtons} ${activeTab === 'output' ? styles.active : ""}`}
+                        > Output Console</button>
+
                 </div>
 
 

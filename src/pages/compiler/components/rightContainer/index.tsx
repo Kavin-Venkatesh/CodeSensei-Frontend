@@ -9,7 +9,7 @@ import axios from "axios";
 import { OutputLoader } from "../../../../components/Loading/index.tsx";
 import { FaSave } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import {toast , ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 export const languageNameToId: Record<string, number> = {
     python: 109,
@@ -19,15 +19,30 @@ export const languageNameToId: Record<string, number> = {
     c: 50,
 };
 
-interface ExecutionResult {
-    input?: string;
-    expectedOutput?: string;
-    compiledOutput?: string;
-    error?: string;
+type TestCaseResult = {
+    input: string;
+    expectedOutput: string;
+    actualOutput: string;
+    passed: boolean;
+    error: string | null;
+    status: {
+        id: number;
+        description: string;
+    };
+    executionTime: string;
+    memoryUsage: number;
+};
+
+type ExecutionResult = {
+    input: string;
+    expectedOutput: string;
+    compiledOutput: string;
+    error: string | null;
     status: "success" | "error";
-    executionTime?: string | number;
-    memoryUsage?: string | number;
-}
+    executionTime: string;
+    memoryUsage: number;
+};
+
 
 interface TestCase {
     id: number;
@@ -36,23 +51,61 @@ interface TestCase {
     isBackend?: boolean;
 }
 
+type Submission = {
+    code: string;
+    language_id: number;
+    language: string;
+    question_id?: number;
+    user_id?: number;
+};
+
 const RightContainer = () => {
-    const { currentQuestion } = useQuestionContext();
+    const { currentQuestion , submissions } = useQuestionContext();
 
     const [showConsole, setShowConsole] = useState(false);
     const [activeTab, setActiveTab] = useState<"input" | "output">("input");
 
     const [codes, setCodes] = useState<Record<number, string>>({});
-    const [language, setLanguage] = useState("python");
+    const [selectedLanguage, setSelectedLanguage] = useState("python");
     const [loading, setLoading] = useState(false);
-    const {id} = useParams();
+    const { id } = useParams();
 
     const [result, setResult] = useState<ExecutionResult[]>([]);
     const [testCases, setTestCases] = useState<TestCase[]>([]);
     const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
-    const [selectedResultTestCase, setSelectedResultTestCase] = useState<number>(0);
+    const [selectedResultTestCase, setSelectedResultTestCase] = useState(0);
+    const [prevSubmission, setPrevSubmission] = useState<Submission>({
+        code: "",
+        language_id: 0,
+        language: "",
+        question_id: 0,
+        user_id: 0,
+    });
+
 
     // Initialize test cases & code when question changes
+    // useEffect(() => {
+    //     if (!currentQuestion) return;
+
+    //     const backendCases: TestCase[] = currentQuestion.test_cases?.map((tc: any) => ({
+    //         id: tc.test_case_id,
+    //         input: tc.input || "",
+    //         output: tc.output || "",
+    //         isBackend: true,
+    //     })) || [];
+
+    //     setTestCases(backendCases);
+    //     setSelectedTestCase(backendCases[0]?.id || null);
+
+    //     if (!(currentQuestion.question_id in codes)) {
+    //         setCodes((prev) => ({
+    //             ...prev,
+    //             [currentQuestion.question_id]: "",
+    //         }));
+    //     }
+    // }, [currentQuestion, submissions]);
+
+
     useEffect(() => {
         if (!currentQuestion) return;
 
@@ -72,7 +125,42 @@ const RightContainer = () => {
                 [currentQuestion.question_id]: "",
             }));
         }
-    }, [currentQuestion]);
+
+        // Map saved submission (from context) into editor when available
+        if (Array.isArray(submissions) && submissions.length > 0) {
+            // try to find a submission for the current question
+            const saved = submissions.find((s: Submission | any) => s.question_id === currentQuestion.question_id);
+            if (saved) {
+                const savedCode = saved.code ?? "";
+                // only update if different to avoid overwriting user typing
+                setCodes((prev) => {
+                    if (prev[currentQuestion.question_id] === savedCode) return prev;
+                    return {
+                        ...prev,
+                        [currentQuestion.question_id]: savedCode,
+                    };
+                });
+
+                // set language if provided (normalize to lowercase)
+                if (saved.language) {
+                    const lang = String(saved.language).toLowerCase();
+                    // only set if it's a known language key
+                    if (lang in languageNameToId) {
+                        setSelectedLanguage(lang);
+                    }
+                }
+
+                // initialize prevSubmission so Save button can detect changes
+                setPrevSubmission({
+                    code: saved.code ?? "",
+                    language_id: saved.language_id ?? 0,
+                    language: saved.language ?? "",
+                    question_id: saved.question_id ?? 0,
+                    user_id: saved.user_id ?? 0,
+                });
+            }
+        }
+    }, [currentQuestion, submissions]);
 
     const toggleOutput = () => setShowConsole(!showConsole);
 
@@ -97,6 +185,8 @@ const RightContainer = () => {
     const activeTestCase = testCases.find((t) => t.id === selectedTestCase);
     const currentCode = currentQuestion ? codes[currentQuestion.question_id] || "" : "";
 
+    const selectedLanguageID = languageNameToId[selectedLanguage];
+
     const handleRunCode = async () => {
         if (!currentQuestion) return;
 
@@ -104,110 +194,124 @@ const RightContainer = () => {
         setShowConsole(true);
         setActiveTab("output");
         setResult([]);
+        setSelectedResultTestCase(0); // First test case active by default
 
-        const language_id = languageNameToId[language];
-        if (!language_id) {
+        if (!selectedLanguageID) {
             console.error("Invalid language selected");
             setLoading(false);
             return;
         }
 
         const access_token = localStorage.getItem("access_token");
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        console.log("Fectched backend url && access token", backendUrl, access_token);
+        const backendurl = import.meta.env.VITE_BACKEND_URL;
 
         try {
-            // Prepare bulk payload
             const payload = {
                 code: currentCode,
-                language_id,
-                testCases: testCases.map((tc) => ({
+                language_id: selectedLanguageID,
+                testCases: testCases.map(tc => ({
                     input: tc.input,
                     output: tc.output,
                 })),
                 question_id: currentQuestion.question_id,
             };
 
-            console.log("payload created", payload);
-            // Send all test cases in one request
-            const res = await axios.post(`${backendUrl}/api/code/executetestcases`, payload, {
+            console.log("Payload sent:", payload);
+
+            const res = await axios.post(`${backendurl}/api/code/executetestcases`, payload, {
                 headers: {
                     "Content-Type": "application/json",
-                    ...(access_token && {
-                        Authorization: `Bearer ${access_token}`,
-                    }),
+                    ...(access_token && { Authorization: `Bearer ${access_token}` }),
                 },
             });
 
-            console.log(res);
-
-            // Backend returns results array
-            if (res.data && res.data.results) {
-                const mappedResults: ExecutionResult[] = res.data.results.map((r: any) => ({
+            if (res.data && Array.isArray(res.data.results)) {
+                const mappedResults: ExecutionResult[] = (res.data.results as TestCaseResult[]).map(r => ({
                     input: r.input,
                     expectedOutput: r.expectedOutput,
                     compiledOutput: r.actualOutput || "",
-                    error: r.error || "",
+                    error: r.error || null,
                     status: r.passed ? "success" : "error",
                     executionTime: r.executionTime,
                     memoryUsage: r.memoryUsage,
                 }));
 
+                console.log("Mapped results:", mappedResults);
                 setResult(mappedResults);
+            } else {
+                console.error("Unexpected backend response:", res.data);
             }
-            else {
-                console.error("Unexpected backend response", res.data);
-            }
-
-        } catch (error) {
-            console.error("Error running code:", error);
+        } catch (err) {
+            console.error("Error running code:", err);
         } finally {
             setLoading(false);
         }
     };
 
 
-    const handleSaveCode = async() =>{
-        try{
+    const handleSaveCode = async () => {
+        try {
             const backendurl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const access_token = localStorage.getItem("access_token");
-            
-            const body = {
-                code : currentCode,
-                language_id : languageNameToId[language],
-                question_id : currentQuestion?.question_id,
-                user_id : id
-            }
-            const response = await axios.post(`${backendurl}/api/code/saveCode` , {
-                    body
-            },{
-                headers :{
-                    "Content-Type" : 'application/json',
-                    ...(access_token &&{
-                        Authorization : `Bearer ${access_token}`
-                    })
-                }
-            });
 
-            if(response.status === 200){
-                toast.success("Saved your code for future use" , {
-                    position :'top-right',
-                    autoClose : 2500
-                })
-            }else{
-                toast.error("Error while saving your code" , {
-                    position:'top-right',
-                    autoClose : 2500
-                })
+
+            const body: Submission = {
+                code: currentCode,
+                language_id: selectedLanguageID,
+                language: selectedLanguage,
+                question_id: currentQuestion?.question_id,
+                user_id: Number(id),
+            };
+
+            const hasChanged = (Object.keys(body) as (keyof Submission)[]).some(
+                key => (body[key] ?? "") !== (prevSubmission[key] ?? "")
+            );
+
+            if (!hasChanged) {
+                toast.info("No changes to save.", { position: "top-right", autoClose: 2000 });
+                return;
             }
-        }catch(err){
-            console.log("error" , err);
-            toast.error("Error while saving your code" , {
-                    position:'top-right',
-                    autoClose : 2500
+
+            const response = await axios.post(`${backendurl}/api/code/saveSubmission`, body,
+                {
+                    headers: {
+                        "Content-Type": 'application/json',
+                        ...(access_token && {
+                            Authorization: `Bearer ${access_token}`
+                        })
+                    }
+                });
+
+            const { success, message } = response.data;
+            if (success) {
+                toast.success(message, { position: 'top-right', autoClose: 2500 });
+                setPrevSubmission(body);
+            } else {
+                toast.error(message || "Something went wrong", { position: 'top-right', autoClose: 2500 });
+            }
+        } catch (err) {
+            console.log("error", err);
+            toast.error("Error while saving your code", {
+                position: 'top-right',
+                autoClose: 2500
             })
         }
     }
+
+        const interpretExecutionResult = (output : any, error : any) => {
+        if (error) {
+            if (
+            error.includes("OSError: [Errno 27] File too large") ||
+            error.toLowerCase().includes("timed out") ||
+            error.toLowerCase().includes("time limit")
+            ) {
+            return "Time Limit Exceeded";
+            }
+            return error;
+        }
+        return output;
+        };
+
 
     return (
         <div className={styles.compilerRightContainer}>
@@ -216,8 +320,8 @@ const RightContainer = () => {
                     name="language"
                     id="language-select"
                     className={styles.languageSelect}
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
                 >
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
@@ -242,7 +346,7 @@ const RightContainer = () => {
                             }));
                         }
                     }}
-                    language={language}
+                    language={selectedLanguage}
                     readOnly={false}
                     theme="vs-dark"
                 />
@@ -284,71 +388,72 @@ const RightContainer = () => {
 
                     {activeTab === "output" ? (
                         <>
-                            {loading === true ? (
-                                <>
-                                    <OutputLoader />
-                                </>
+                            {loading ? (
+                                <OutputLoader />
                             ) : (
                                 <>
-                                    {result.length === 0 &&
+                                    {result.length === 0 ? (
                                         <div className={styles.emptyResultMessage}>
-                                            <h1> Write some code and excecute <br /> the code to see the output</h1>
-                                        </div>}
-                                    <div className={styles.testCaseContainer}>
-                                        {result.map((res, index) => {
-                                            const isPassed = res.status === "success";
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className={`${styles.testCase} ${isPassed ? styles.passedCase : styles.failedCase} ${selectedResultTestCase === index ? styles.activeCase : ""
-                                                        }`}
-                                                    onClick={() => setSelectedResultTestCase(index)}
-                                                >
-                                                    <p>
-                                                        <span>.</span> Case {index + 1}
-                                                    </p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {selectedResultTestCase !== null && result[selectedResultTestCase] && (
-                                        <div className={styles.inputContainer}>
-                                            <div className={styles.excecutionDetailsContainer}>
-                                                <h3>result[selectedResultTestCase].status</h3>
-                                                <h5>result[selectedResultTestCase].memoryUsage</h5>
-                                                <h5>result[selectedResultTestCase].executionTime</h5>
-                                            </div>
-                                            {result[selectedResultTestCase].input && (
-                                                <>
-                                                    <label>Input</label>
-                                                    <textarea className={styles.testCaseInputContainer} value={result[selectedResultTestCase].input} readOnly />
-                                                </>
-                                            )}
-
-                                            {result[selectedResultTestCase].expectedOutput && (
-                                                <>
-                                                    <label>Expected Output</label>
-                                                    <textarea className={styles.testCaseInputContainer} value={result[selectedResultTestCase].expectedOutput} readOnly />
-                                                </>
-                                            )}
-
-                                            <label>Compiled Output</label>
-                                            <textarea
-                                                className={`${styles.testCaseInputContainer} ${result[selectedResultTestCase].status === "error" ? styles.errorOutput : ""
-                                                    }`}
-                                                value={
-                                                    result[selectedResultTestCase].status === "error"
-                                                        ? result[selectedResultTestCase].error || "Unknown Error"
-                                                        : `Actual Output:\n${result[selectedResultTestCase].compiledOutput || ""}\n\nExpected:\n${result[selectedResultTestCase].expectedOutput || ""}`
-                                                }
-                                                readOnly
-                                            />
-
+                                            <h1>Write some code and execute to see the output</h1>
                                         </div>
+                                    ) : (
+                                        <>                                          
+                                            <div className={styles.outputTestCaseContainer}>
+                                                {result.map((res, index) => {
+                                                    const isPassed = res.status === "success";
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className={`${styles.testCase} ${isPassed ? styles.passedCase : styles.failedCase
+                                                                } ${selectedResultTestCase === index ? styles.activeCase : ""
+                                                                }`}
+                                                            onClick={() => setSelectedResultTestCase(index)}
+                                                        >
+                                                            <p>Case {index + 1}</p>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Selected test case details */}
+                                            {selectedResultTestCase !== null && result[selectedResultTestCase] && (
+                                                <div className={styles.outputContainer}>
+                                                    <div className={styles.excecutionDetailsContainer}>
+                                                        <h3 className={`${styles.executionStatus} ${result[selectedResultTestCase].status === "success" ? styles.acceptedResult : styles.wrongResult }`}>  {result[selectedResultTestCase].status === "success" ? "Accepted" : "Wrong Answer"  } </h3>
+                                                        <h5 className={styles.executionTime}>{result[selectedResultTestCase].executionTime} ms</h5>
+                                                    </div>
+
+                                                    <label>Input</label>
+                                                    <textarea
+                                                        className={styles.testCaseInputContainer}
+                                                        value={result[selectedResultTestCase].input}
+                                                        readOnly
+                                                    />
+
+                                                    <label>Expected Output</label>
+                                                    <textarea
+                                                        className={styles.testCaseInputContainer}
+                                                        value={result[selectedResultTestCase].expectedOutput}
+                                                        readOnly
+                                                    />
+
+                                                    <label>Compiled Output</label>
+                                                    <textarea
+                                                        className={styles.testCaseInputContainer}
+                                                        value={interpretExecutionResult(
+                                                                result?.[selectedResultTestCase]?.compiledOutput,
+                                                                result?.[selectedResultTestCase]?.error
+                                                                )}
+                                                        readOnly
+                                                        />
+
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </>
                             )}
+
                         </>
                     ) : (
                         <>

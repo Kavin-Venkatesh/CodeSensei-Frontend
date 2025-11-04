@@ -7,21 +7,15 @@ import styles from "./learning.module.css";
 import { SiTicktick } from "react-icons/si";
 import { FaLock } from "react-icons/fa";
 import { FaLightbulb } from "react-icons/fa";
-import { RiAiGenerate2 } from "react-icons/ri";
 import { IoMenuSharp } from "react-icons/io5";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { GrCaretPrevious } from "react-icons/gr";
 import { GrCaretNext } from "react-icons/gr";
 import { toast, ToastContainer } from "react-toastify";
 
-import Beginner from "../../assets/basic.png"
-import Intermediate from "../../assets/intermediate.png"
-import Advanced from "../../assets/advanced.png"
-
 
 import AssessPanel from "./components/AssesPanel";
 import { Loading } from "../../components/Loading/index.tsx";
-import Modal from "../../components/Modal/index.tsx";
 import MarkdownRenderer from "./components/markdownRenderer";
 
 
@@ -77,9 +71,6 @@ const LearningPage = () => {
     const [isLearningPathVisible, setIsLearningPathVisible] = useState(true);
     const [learningPath, setLearningPath] = useState<Topics[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<Topics | null>(null);
-    const [difficultyLevel, setDifficultyLevel] = useState("beginner");
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
     const [isContentLoading, setIsContentLoading] = useState(true);
     const [topicData, setTopicData] = useState<TopicContentResponse["data"]["content"] | null>(null);
 
@@ -87,45 +78,65 @@ const LearningPage = () => {
 
     const { id } = useParams();
 
-    const fetchTopics = async () => {
-        try {
-            console.log("Fetching topics for learning path...");
-            console.log("Language ID:", id);
+const fetchTopics = async () => {
+    try {
+        console.log("Fetching topics for learning path...");
+        const courseId = id;
+        console.log("Course ID:", courseId);
 
-            // Validate id before making the API call
-            if (!id) {
-                console.error("Course ID is missing. Cannot fetch topics.");
-                return;
-            }
-
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-            const accessToken = localStorage.getItem("access_token");
-
-            const response = await axios.get<TopicsApiResponse>(`${backendUrl}/api/topics/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(accessToken && {
-                        Authorization: `Bearer ${accessToken}`
-                    })
-                }
-            });
-
-            console.log(response.data.data.topics);
-            const topics = response.data.data.topics;
-            setLearningPath(topics);
-
-            // Set the first incomplete topic as selected, or the first topic if all are completed
-            const firstIncomplete = topics.find(topic => !topic.is_completed);
-            const topicToSelect = firstIncomplete || topics[0];
-            if (topicToSelect) {
-                setSelectedTopic(topicToSelect);
-            }
-
-        } catch (err) {
-            console.error("Error fetching topics:", err);
+        if (!courseId) {
+            console.error("Course ID is missing. Cannot fetch topics.");
+            return;
         }
-    };
 
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+        const accessToken = localStorage.getItem("access_token");
+
+        // Try to get user id from localStorage (set on login). Backend also accepts req.user if auth middleware is used.
+        const storedUser = localStorage.getItem("user");
+        const userId = storedUser ? Number(JSON.parse(storedUser).id) : undefined;
+
+        if (!userId) {
+            console.warn("User ID not found in localStorage. Backend requires user_id query param unless auth middleware supplies req.user.");
+            // You can still call the endpoint without user_id if your server uses req.user from token,
+            // otherwise consider redirecting to login or setting user_id on login.
+        }
+        
+        const response = await axios.get<TopicsApiResponse>(`${backendUrl}/api/topics/course/${courseId}`, {
+            params: {
+                ...(userId && { user_id: userId }),
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(accessToken && { Authorization: `Bearer ${accessToken}` })
+            }
+        });
+
+        const topics = response.data.data.topics || [];
+        console.log("Raw topics data:", topics);
+        // Ensure is_completed is numeric 0 | 1
+        const normalizedTopics = topics.map(t => ({
+            ...t,
+            is_completed: Number(t.is_completed) === 1 ? 1 : 0,
+            topic_id: Number(t.topic_id),
+            language_id: Number(t.language_id),
+        }));
+
+        console.log("Fetched topics:", normalizedTopics);
+        setLearningPath(normalizedTopics);
+
+        const firstIncomplete = normalizedTopics.find(topic => topic.is_completed !== 1);
+        const topicToSelect = firstIncomplete || normalizedTopics[0];
+        if (topicToSelect) {
+            setSelectedTopic(topicToSelect);
+        }
+
+    } catch (err: any) {
+        console.error("Error fetching topics:", err);
+        // show friendly toast
+        toast.error(err?.response?.data?.message || "Failed to fetch topics", { autoClose: 3000 });
+    }
+};
 
     const fetchTopicContent = async (topicId: number) => {
         try {
@@ -205,85 +216,6 @@ const LearningPage = () => {
 
     const handleTopicSelect = (topic: Topics) => {
         setSelectedTopic(topic);
-    };
-
-    const handleDifficultyLevel = (e: string) => {
-        setDifficultyLevel(e);
-    }
-
-    const handleQuestionGeneration = async () => {
-        try {
-            setIsGeneratingQuestion(true);
-
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-            const accessToken = localStorage.getItem("access_token");
-
-            const response = await axios.post(
-                `${backendUrl}/api/topics/generate-question`,
-                {
-                    topicId: selectedTopic?.topic_id,
-                    topicTitle: selectedTopic?.topic_title,
-                    difficultyLevel: difficultyLevel,
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        ...(accessToken && {
-                            Authorization: `Bearer ${accessToken}`,
-                        }),
-                    },
-                }
-            );
-
-            // ✅ Success case
-            if (response.status === 200 && response.data.success) {
-                setQuestion(response.data.data);
-                setIsModalOpen(false);
-                toast.success("🎯 Question generated successfully!", {
-                    position: "top-right",
-                    autoClose: 2500,
-                });
-            } else {
-                // ⚠️ Unexpected success structure
-                toast.warn(response.data.message || "Unexpected response from server", {
-                    position: "top-right",
-                });
-            }
-
-        } catch (err: any) {
-            console.error("Error generating question:", err);
-            setIsModalOpen(false);
-
-            let errorMessage = "Something went wrong. Please try again later.";
-
-            // 🧠 Detailed error mapping
-            if (axios.isAxiosError(err)) {
-                if (err.response) {
-                    const status = err.response.status;
-
-                    if (status === 400) {
-                        errorMessage = "❗ Missing required fields. Please check your input.";
-                    } else if (status === 401) {
-                        errorMessage = "🔒 Unauthorized. Please log in again.";
-                    } else if (status === 429) {
-                        errorMessage = "🚫 Generation limit reached for this topic. Try again later.";
-                    } else if (status >= 500) {
-                        errorMessage = "💥 Server error while generating question. Please retry later.";
-                    } else {
-                        errorMessage = err.response.data?.message || "⚠️ Unexpected error occurred.";
-                    }
-                } else {
-                    errorMessage = "🌐 Network error. Please check your internet connection.";
-                }
-            }
-
-            toast.error(errorMessage, {
-                position: "top-right",
-                autoClose: 3000,
-            });
-        } finally {
-            setIsGeneratingQuestion(false);
-        }
     };
 
     const handlePreviousTopic = () => {
@@ -491,85 +423,12 @@ const LearningPage = () => {
 
 
                     <div className={styles.questionGenerationContainer}>
-                        <p>Practice with AI Generated Questions</p>
-                        <button className={styles.generateQuestionButton}
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            Generate Question <RiAiGenerate2 className={styles.generateAIImage} />
-                        </button>
-
-                        <Modal
-                            isOpen={isModalOpen}
-                            onClose={() => setIsModalOpen(false)}
-                            title="Practice Question Difficulty level"
-                            width="50vw"
-                            height="40vh"
-                        >
-                            {isGeneratingQuestion === true && (
-                                <div className={styles.loadingOverlay}></div>
-                            )}
-                            {isGeneratingQuestion === true ? (
-                                <div className={styles.spinnerContainer}>
-                                    <div className={styles.spinner}>
-                                        <div className={styles.spinner}>
-                                            <div className={styles.spinner}>
-                                                <div className={styles.spinner}>
-                                                    <div className={styles.spinner}>
-                                                        <div className={styles.spinner} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            ) : (<>
-
-                                <div className={styles.modalImagesContainer}>
-                                    <div
-                                        className={`${styles.imageContainers} ${difficultyLevel === "Beginner" ? styles.selectedDifficulty : ""}`}
-                                        onClick={() => handleDifficultyLevel("Beginner")}
-                                    >
-                                        <div className={styles.modalImageContainer}>
-                                            <img className={styles.modalImageContainerImg} src={Beginner} alt="Beginner Image" />
-                                        </div>
-
-                                        <p className={styles.imageContainersTitle}>Beginner</p>
-                                    </div>
-
-                                    <div
-                                        className={`${styles.imageContainers} ${difficultyLevel === "Intermediate" ? styles.selectedDifficulty : ""}`}
-                                        onClick={() => handleDifficultyLevel("Intermediate")}
-                                    >
-                                        <div className={styles.modalImageContainer}>
-                                            <img className={styles.modalImageContainerImg} src={Intermediate} alt="Beginner Image" />
-                                        </div>
-                                        <p className={styles.imageContainersTitle}>Intermediate</p>
-                                    </div>
-
-                                    <div
-                                        className={`${styles.imageContainers} ${difficultyLevel === "Advanced" ? styles.selectedDifficulty : ""}`}
-                                        onClick={() => handleDifficultyLevel("Advanced")}
-                                    >                            <div className={styles.modalImageContainer}>
-                                            <img className={styles.modalImageContainerImg} src={Advanced} alt="Beginner Image" />
-                                        </div>
-
-                                        <p className={styles.imageContainersTitle}>Advanced</p>
-                                    </div>
-                                </div>
-                                <button
-                                    className={styles.modalConfirmDifficulty}
-                                    onClick={handleQuestionGeneration}
-                                >
-                                    Confirm
-                                </button>
-                            </>)}
-                        </Modal>
+                        <p>Practice Syntax Here!</p>
                     </div>
 
 
                     {question === null ? "" : (
-                        <AssessPanel generatedQuestion={question} languageId={selectedTopic?.language_id || 0} />
+                        <AssessPanel  languageId={selectedTopic?.language_id || 0} />
                     )}
 
 

@@ -135,6 +135,7 @@
   flex-grow: 0;
   align-items: center;
   background-color: #3a3a3a;
+  border-radius: 5px;
 }
 
 .testCaseSwitchButton{
@@ -190,15 +191,25 @@
 .testCaseContainer{
     display: flex;
     width: 100%;
-    height: 6em;
+    height: 10em;
     overflow-y: hidden;
     overflow-x: auto;
     align-items: center;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;            
+    scrollbar-color: #555 transparent; 
+
 }
 
-.testCaseContainer::-webkit-scrollbar {
-  display: none;           /* Chrome, Safari, Opera */
+.outputTestCaseContainer{
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: center;
+  box-sizing: border-box;
+  overflow-x: auto;       
+  overflow-y: hidden;     
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
 }
 
 .testCase{
@@ -228,7 +239,7 @@
 }
 
 .testCaseCloseButton {
-   position: absolute;
+  position: absolute;
   top: -10px;
   right: -10px;
   border: none;
@@ -236,7 +247,7 @@
   color: #aaa;
   font-size: 18px;
   cursor: pointer;
-  display: none; /* hidden by default */
+  display: none;
   background-color: #615d5d;
   border-radius: 10px;
 
@@ -278,11 +289,23 @@
   height: 100%;
 }
 
-.inputContainer label{
-  font-size: lighter;
-  font-size: 1.1rem;
-  margin: 0 0 0 1em;
+.outputContainer{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
+
+.inputContainer label{
+  font-size: 1rem;
+  margin: 0 0 0 2em;
+}
+
+.outputContainer label{
+  font-size: 1rem;
+  margin: 0 0 0 2em;
+}
+
 
 .testCaseInputContainer { 
   width: 80%;
@@ -294,7 +317,10 @@
   border-radius: 5px;
   padding:0.8rem;    
   font-size: 1rem;   
-  margin : 1rem 1rem 1rem 2rem;   
+  margin : 1rem 1rem 1rem 2rem;  
+  scrollbar-width: thin;            
+  scrollbar-color: #555 transparent; 
+
 }
 
 .testCaseInputContainer::placeholder{
@@ -314,9 +340,28 @@
 
 .excecutionDetailsContainer{
   width: 100%;
-  height: 5rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  margin : 0 0 1rem 0;
 }
 
+.acceptedResult{
+  font-size: 1.5rem;
+  color : var(--success);
+  margin: 0.5rem 0 0 2rem;
+}
+
+.wrongResult{
+  font-size: 1.5rem;
+  color: var(--error);
+  margin: 0.5rem 0 0 2rem;
+}
+
+.executionTime{
+  font-size: 1rem;
+  margin : 0.5rem 0rem 0rem 2rem;
+}
 .emptyResultMessage{
   width: 100%;
   height: 100%;
@@ -329,7 +374,7 @@
 .emptyResultMessage h1{
   font-size: 2rem;
   background-color: transparent;
-    background: linear-gradient(90deg, var(--accent-dark), #192bf3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  background: linear-gradient(90deg, var(--accent-dark), #192bf3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

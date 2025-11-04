@@ -60,14 +60,14 @@
     align-items:flex-start;
     justify-content: flex-start;
     width: 20vw;
-    height: 70vh;
+    height: 85vh;
     background-color: var(--background-alt);
     padding: 1rem;
     position: relative;
     top: 0;
     left: 0;
     z-index: 10;
-    margin : 2.5rem 0 0 1rem;
+    margin : 3rem 0 0 1rem;
     border-radius: 10px;
     transition: transform 0.3s ease;
     overflow-x: hidden;
@@ -162,10 +162,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content : cerber;
     width: 100%;
-    height: 70vh;
-    margin: 2rem 1rem 0 0;
+    height: 85vh;
+    margin: 3rem 1rem 0 0;
     background-color: var(--background-alt);
     padding: 1rem;
     border-radius: 10px
@@ -212,13 +212,16 @@
     scrollbar-width: thin;
     scrollbar-color: #888 var(--background-alt);
     padding-right: 10px;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 .learningContentBody p{
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--text);
-    line-height: 1.6;
+    line-height: 2;
     margin-bottom: 1rem;
+    text-align: justify;
 }
 
 .learningContentBody code{
@@ -227,36 +230,38 @@
     border-radius: 4px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
+    text-align: justify;
 }
-
-
 
 .codeEditorContainer{
     display: flex;
-    flex-direction: column;
     height: 100%;
     width: 100%;
     overflow: hidden;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.codeEditorContainer:fullscreen {
-    width: 100vw;
-    height: 100vh;
+.editorMainContainer{
+    width: 50vw;
+    height: 100%;
+    margin-bottom: 0.5rem;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
 }
 
 .editorSection {
-    width: 100%;
+    width: 48%;
     height: 100%;
     display: flex;
     flex-direction: column; 
 }
 
-.editorBottom {
+.editorButtonContainer {
+    width: 60%;
+    height: 4rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-evenly;
     color: white;
 }
 
@@ -264,7 +269,8 @@
     background-color: var(--secondary);
     color: white;
     border: none;
-    padding: 0.7rem 1.4rem;
+    width : 5rem;
+    height: 4rem;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1.2rem;
@@ -281,36 +287,20 @@
     cursor: not-allowed;
 }
 
-.clearButton {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.clearButton:hover {
-    background-color: #c82333;
-}
-
-.resetButton {
+.resetCodeButton {
     background-color: #ffc107;
     color: #212529;
     border: none;
-    padding: 0.5rem 1rem;
+    width : 5rem;
+    height: 4rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     font-weight: bold;
     transition: background-color 0.3s ease;
-    margin-right: 1rem;
 }
 
-.resetButton:hover {
+.resetCodeButton:hover {
     background-color: #e0a800;
 }
 
@@ -318,15 +308,23 @@
 .switchButtons{
     color: #212529;
     border: none;
-    padding: 0.5rem 1rem;
+    width : 9rem;
+    height: 4rem;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1.3rem;
     font-weight: bold;
     transition: background-color 0.3s ease-out;
-    margin-right: 1rem;
 }
 
+.switchButtons:hover{
+    background-color: var(--accent-light);
+}
+
+.switchButtons:active{
+    background-color: var(--accent);
+    color: white;
+}
 
 .active{
     background: var(--accent); /* Blue */
@@ -335,7 +333,7 @@
 }
 .InputOutputContainer{
     width: 100%;
-    height : 50%;
+    height : 90%;
     background-color: var(--editor-style);
     overflow: hidden;
     margin : 0.3rem 0 0 0;
@@ -344,17 +342,17 @@
 .inputContainer{
     display: flex;
     flex-direction: column;
-    height:  10rem; 
-    margin : 0.75rem
+    height: 40rem; 
+    margin : 0.5rem;
 }
 
 .editorInputFeild {
   width: 100%;
   height: 100%;
-  box-sizing: border-box; /* ✅ include padding & border inside % */
+  box-sizing: border-box; 
   resize: none;
   font-family: monospace;
-  font-size: 14px;
+  font-size: 1.2rem;
   border-radius: 6px;
   background-color: var(--editor-style);
   color: var(--text-inverse);
@@ -468,7 +466,9 @@
   flex-direction: column;
   background: #1e1e1e;
   border-radius: 6px;
-  max-height: 300px;   /* or vh based */
+  background-color: #212529;
+  margin: 0.5rem;
+  height: 40rem;   /* or vh based */
 }
 
 .outputContent {
@@ -476,6 +476,7 @@
   overflow-y: auto;    /* ✅ scrolls */
   padding: 0.5rem;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size : 1.4rem;
 }
 
 .consoleSuccess {
@@ -788,7 +789,37 @@
         padding: 0.5rem;
     }
 
+    .codeEditorContainer{
+        flex-direction: column;
+    }
 
+    .editorMainContainer{
+        width : 100%;
+        height: 100%;
+    }
+
+    .editorSection{
+        width: 100%;
+        height: 50%;
+    }
+
+    .runButton{
+        width : 6rem;
+        height: 3rem;
+    }
+
+    .resetCodeButton{
+        width : 6rem;
+        height: 3rem;
+        margin : 0 0 0 1rem;
+    }
+
+    .switchButtons{
+        width : 8rem;
+        height: 3rem;
+        margin : 0 0 0 1rem;
+        font-size: 1rem;
+    }
 
 }
 

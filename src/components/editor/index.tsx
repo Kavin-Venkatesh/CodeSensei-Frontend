@@ -53,7 +53,7 @@ const OurEditor = ({value = "",language , onChange , readOnly = false, theme = "
                 readOnly: readOnly,
                 minimap: { enabled: false },
                 fontSize: 20,
-                automaticLayout: false,
+                automaticLayout: true,
                 scrollBeyondLastLine: false,
                 theme: theme
             }}

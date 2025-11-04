@@ -12,6 +12,8 @@ interface Props {
 const GoogleLoginButton: React.FC<Props> = ({ onLogin, className , onError }) => {
   const handleSuccess = async (credentialResponse: any) => {
     try {
+
+      console.log("<======Google Login Success=======>", credentialResponse);
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
       const res = await axios.post(
         `${backendUrl}/api/auth/google`,

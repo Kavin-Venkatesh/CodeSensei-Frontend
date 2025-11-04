@@ -8,7 +8,7 @@ import { useQuestionContext } from "../../contextAPI/index.tsx";
 const LeftContainer = () => {
 
     const [isModalOpen , setIsModalOpen] = useState(false);
-    const { questions, setCurrentQuestion , currentQuestion} = useQuestionContext();
+    const { questions, setCurrentQuestion , currentQuestion } = useQuestionContext();
     return (
         <div className={styles.compilerLeftContainer}>
             <div className={styles.compilerLeftContainerHeader}>
@@ -24,7 +24,7 @@ const LeftContainer = () => {
                 onClose={() => setIsModalOpen(false)}
                 title='Add Questions'
                 width='50vw'
-                height = '50v'
+                height = '50vh'
             >
                 <div className={styles.modalMainContainer}>                    
                     <div className={styles.questionContainer}>
@@ -48,13 +48,30 @@ const LeftContainer = () => {
                                 ${isSelected ? styles.selected : ""}`
                         }
                             key={question.question_id}
-                            onClick={() => setCurrentQuestion(question.question_id)
-                            
-                            }
+                            onClick={() => setCurrentQuestion(question.question_id)}
                         > 
                         {index  + 1}
                         </div> ) 
                     })}
+                </div>
+
+                <div className={styles.bottomColorContainer}>
+                    <div className = {styles.colorContainer}>
+                        <div className={styles.notSelectedContainer}>
+
+                        </div> - <h2>Not selected</h2>
+                    </div>
+                    <div className = {styles.colorContainer}>
+                        <div className={styles.selectedContainer}>
+
+                        </div> - <h2>Selected</h2>
+                    </div>
+                    <div className = {styles.colorContainer}>
+                        <div className={styles.savedContainer}>
+
+                        </div> - <h2> Saved </h2>
+                    </div>
+                    
                 </div>
             </div>
         </div>

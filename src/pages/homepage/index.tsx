@@ -55,7 +55,7 @@ const Homepage: React.FC = () => {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
 
-            const response = await axios.get<CourseApiResponse>(`${backendUrl}/api/courses`, {
+            const response = await axios.get<CourseApiResponse>(`${backendUrl}/api/courses/${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...(accessToken && {

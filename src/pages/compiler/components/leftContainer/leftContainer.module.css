@@ -2,11 +2,12 @@
     display: flex;
     flex-direction: column;
     width: 12%;
-    height: 99%;
+    height: 99vh;
     background-color: var(--background-alt);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin : 0 0 0 0.5rem;
     border-radius: 10px;
+    justify-content: space-between;
 }
 
 .compilerLeftContainerHeader{
@@ -50,23 +51,13 @@
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+    flex-grow: 0;
     overflow-y: auto;    
-    overflow-x: hidden; 
-}
-
-.questionsList::-webkit-scrollbar {
-    width: 6px; /* vertical scrollbar width */
-}
-
-.questionsList::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 3px;
-}
-
-.questionsList::-webkit-scrollbar-track {
-    background: transparent;
+    overflow-x: hidden;
+    justify-content: center;
+    min-height: 50%;
+    scrollbar-width: thin;             
+    scrollbar-color: #555 transparent; 
 }
 
 
@@ -93,6 +84,7 @@
     color: white;
     transform: scale(1.05);
     transition: all 0.3s ease-in-out;
+    border : 2px soldi var(--primary);
 }
 
 .questionsListItems:active{
@@ -142,16 +134,69 @@
     width: 100;
 }
 
-
-
-/* ✅ submitted question */
 .submitted {
   background-color:var(--success);
   color: white;
+  border : 2px solid var(--success);
+
 }
 
-/* ✅ currently selected */
 .selected {
   background-color: var(--primary);
   color: white;
+  border: 2px solid var(--primary);
+}
+
+.bottomColorContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.colorContainer{
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+}
+
+.colorContainer h2{
+    font-size: large;
+    margin:0 0 0 0.5rem;
+}
+
+.notSelectedContainer{
+    width: 20%;
+    height: 40px;
+    display: flex;
+    border-radius: 10px;
+    background-color: var(--background-alt);
+    border: none;
+    border : 2px solid var(--primary);
+    margin : 0.3rem;
+}
+
+.selectedContainer{
+    width: 20%;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--text);
+    background-color: var(--primary);
+    border: none;
+    font-weight: bold;
+    border : 2px solid var(--primary);
+    margin: 0.3rem;
+}
+
+.savedContainer{
+    width: 20%;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--text);
+    background-color: var(--success);
+    border: none;
+    font-weight: bold;
+    border : 2px solid var(--success);
+    margin: 0.3rem;
 }
