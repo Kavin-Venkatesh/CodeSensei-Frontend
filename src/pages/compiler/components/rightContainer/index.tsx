@@ -74,6 +74,8 @@ const RightContainer = () => {
     const [testCases, setTestCases] = useState<TestCase[]>([]);
     const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
     const [selectedResultTestCase, setSelectedResultTestCase] = useState(0);
+    const [isExecuting, setIsExecuting] = useState(false);
+
     const [prevSubmission, setPrevSubmission] = useState<Submission>({
         code: "",
         language_id: 0,
@@ -306,8 +308,12 @@ const RightContainer = () => {
                     <option value="c">C</option>
                 </select>
 
-                <button className={styles.runButton} onClick={handleRunCode}>
-                    {loading ? "Running" : "Run"}
+                <button 
+                    className={styles.runButton}
+                    onClick={handleRunCode}
+                    disabled={loading}
+                >
+                    {loading ? "..." : "Run"}
                 </button>
             </div>
 

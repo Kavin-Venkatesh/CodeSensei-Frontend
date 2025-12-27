@@ -10,6 +10,8 @@ import Title from "../../assets/Title.png";
 import DefaultProfile from "../../assets/CodeSensei_Logo.png";
 import { VscFoldDown } from "react-icons/vsc";
 import { FaCode } from "react-icons/fa";
+import { FaBars } from "react-icons/fa";
+import { MdLogout } from "react-icons/md";
 
 interface Course {
     course_id: number,
@@ -32,19 +34,17 @@ interface CourseApiResponse {
 
 
 const Homepage: React.FC = () => {
-    const [imageError, setImageError] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [courses, setCourses] = useState<Course[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
-
+    const [istoggleMenu , setToggleMenu] = useState(false);
 
     const storedUser = localStorage.getItem("user");
     const {id} =  useParams();
     const user = storedUser ? JSON.parse(storedUser) : null;
 
-    const profileImageUrl = user?.picture || DefaultProfile;
 
     // Function to fetch courses from API
     const fetchCourses = async () => {
@@ -119,10 +119,6 @@ const Homepage: React.FC = () => {
         };
     }, [dropdownOpen]);
 
-    const handleDropDownToggle = () => {
-        setDropdownOpen(!dropdownOpen);
-    };
-
     const handleLearningNavigation = (course_id: number) => {
         navigate(`/learning/${course_id}`);
     }
@@ -131,72 +127,52 @@ const Homepage: React.FC = () => {
         navigate(`/compiler/${id}`);
     };
 
+    const handleMenuToggle = () => {
+        setToggleMenu(!istoggleMenu);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
+        navigate("/");
+    };
 
     return (
         <div className={styles.homeMainContainer}>
-            {/* Navbar Section */}
+
             <div className={styles.homeNavbar}>
                 <div className={styles.pageNavigationContainer}>
-
-                    <img src={Title} alt="CodeSensei Logo" className={styles.logo} />
-
-                    <button className={styles.editorNavigationButton}
-                        onClick={handleCompilerNavigation}
-                    > 
-                        Complier
-                        <FaCode />
+                    
+                       <button
+                        className={styles.menuButton}
+                        onClick={handleMenuToggle}
+                        >
+                        <FaBars />
                     </button>
 
-
+                    <img src={Title} alt="CodeSensei Logo" className={styles.logo} />                 
+    
                 </div>
 
-                <div className={styles.profileSection}>
-                    <div className={styles.profileDropdown}>
-                        <button
-                            className={styles.profileButton}
-                            onClick={handleDropDownToggle}
-                        >
-                            <img
-                                src={imageError ? DefaultProfile : profileImageUrl}
-                                alt={user?.name || "Profile"}
-                                className={styles.profileImage}
-                                crossOrigin="anonymous"
-                                referrerPolicy="no-referrer"
-                                onLoad={() => {
-                                    setImageError(false);
-                                }}
-                                onError={() => {
-                                    setImageError(true);
-                                }}
-                            />
+
+
+                <div className={`${styles.mobileMenu} ${styles.menubarButtonContainer} ${istoggleMenu ? styles.mobileMenuOpen : ''}`}>
+                        <button 
+                            className={styles.editorNavigationButton}
+                            onClick={handleCompilerNavigation}
+                            > 
+                            Compiler
+                            <FaCode />
                         </button>
 
-                        {dropdownOpen && (
-                            <div className={styles.dropdownMenu}>
-                                <button
-                                    className={styles.dropdownItem}
-                                    onClick={() => {
 
-                                        setDropdownOpen(false);
-                                    }}
-                                >
-                                    Profile
-                                </button>
-                                <button
-                                    className={styles.dropdownItem}
-                                    onClick={() => {
-                                        // Handle logout
-                                        localStorage.removeItem("user");
-                                        localStorage.removeItem("access_token");
-                                        setDropdownOpen(false);
-                                        navigate('/');
-                                    }}
-                                >
-                                    Logout
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                        <button
+                            className={styles.logoutButton}
+                            onClick={handleLogout}
+                        >
+                            Logout
+                            <MdLogout />
+                        </button>
                 </div>
             </div>
 

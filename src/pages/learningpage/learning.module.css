@@ -6,7 +6,7 @@
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    align-items: center;
+    align-items: flex-start;
     scrollbar-width: thin;
     scrollbar-color: #888 #f9f9f9;
 }
@@ -162,7 +162,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content : cerber;
+    justify-content : center;
     width: 100%;
     height: 85vh;
     margin: 3rem 1rem 0 0;
@@ -702,7 +702,7 @@
 @media (max-width: 768px) {
     .learningPath {
         width: 80vw;
-        height: 100vh;
+        height: 80vh;
         position: fixed;
         overflow-x: hidden;
         overflow-y:auto;
@@ -714,8 +714,12 @@
     }
 
     .learningNavbar h1{
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         margin: 0 0 0 1rem;
+    }
+
+    .learningPathHeader h2{
+        font-size: 1.2rem;
     }
 
     .learningPathItem{
@@ -723,57 +727,32 @@
     }
 
     .contentMainContainer{
-        width: 100%;
-        height: auto;
+        height: 100%;
+        margin: 4rem 0rem 0 0;
+        background-color: var(--background-alt);
         padding: 0.5rem;
+        border-radius: 10px
+    }
+    .learningContentBody{
+        padding-right: 0px;
     }
 
+    .learningContentBody p{
+        font-size: 1.1rem;
+    }
+    .learningContentBody h1{
+        font-size: 1.3rem;
+    }
     .learningContentHeader h3{
-        font-size: 1rem;
+        font-size: 1.2rem;
+    }
+    .menuIcon{
+        font-size: 3rem;
     }
 
     .questionGenerationContainer p{
-        font-size: 1.2rem;
+        display: none;
     }
-
-    .readAloudButton{
-        padding:0.8rem;
-        font-size: 0.8rem;
-        border-radius:10px;
-    }
-
-    .generateQuestionButton{
-         width : 10rem;
-        padding: 0.8rem;
-        font-size: 1rem;
-    }
-
-    .modalImagesContainer{
-        flex-direction: column;
-        height: auto;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .modalConfirmDifficulty{
-        margin:  0 0 0 10rem;
-    }
-
-    .imageContainers{
-        width: 50%;
-        height: 14rem;
-    }
-
-    .modalImageContainerImg{
-        width: 80%;
-        height: 80%;
-    }
-
-    .imageContainersTitle{
-        font-size: medium;
-        font-weight: lighter;
-    }
-
     .InputOutputContainer{
         height : 100%;
     }
@@ -781,7 +760,6 @@
     .outputContainer{
         max-height: 200px;   /* or vh based */
     }
-   
     .previousTopicNavigation,
     .nextTopicNavigation,
     .topicCompletion{

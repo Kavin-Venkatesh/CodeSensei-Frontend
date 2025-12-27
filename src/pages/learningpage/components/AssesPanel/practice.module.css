@@ -25,9 +25,7 @@
 
 @media (max-width: 768px) {
     .assessmentMainContainer{
-        flex-direction: column;
-        overflow-y: auto;
-        overflow-x: hidden;
+        display: none;
     }
 
     .assessRightContainer{

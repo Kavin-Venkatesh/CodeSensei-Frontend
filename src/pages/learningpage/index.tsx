@@ -358,8 +358,7 @@ const fetchTopics = async () => {
                             </div>
                             <ul className={styles.learningPathList}>
                                 {learningPath.map((item, index) => {
-                                    // Rule: first topic always clickable
-                                    // Or previous topic must be completed
+
                                     const canNavigate =
                                         index === 0 || learningPath[index - 1].is_completed === 1;
 
@@ -425,10 +424,8 @@ const fetchTopics = async () => {
                     <div className={styles.questionGenerationContainer}>
                         <p>Practice Syntax Here!</p>
                     </div>
-
-
-
-                        <AssessPanel  languageId={selectedTopic?.language_id || 0} />
+                
+                    <AssessPanel  languageId={selectedTopic?.language_id || 0} />
 
                     <div className={styles.learningNavigation}>
                         <button

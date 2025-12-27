@@ -66,6 +66,7 @@ export default function JsonEditor({
   const [text, setText] = useState<string>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -104,7 +105,12 @@ export default function JsonEditor({
   const lineNumbers = Array.from({ length: Math.max(1, lineCount) }, (_, i) => i + 1);
 
   const handleQuestionCreation = async () => {
+
+    if( isLoading ) return;
     try {
+
+      setIsLoading(true);
+
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
       const access_token = localStorage.getItem("access_token");
       const parsedData = JSON.parse(text)
@@ -139,6 +145,10 @@ export default function JsonEditor({
         autoClose: 2500
       })
     }
+    finally{
+      setIsLoading(false);
+    }
+
   }
   return (
     <div className={styles.wrapper} style={{ width }}>
@@ -185,9 +195,18 @@ export default function JsonEditor({
           </div>
         )}
         <div className={styles.stats}>
-          <button className={styles.addQuestionsBtn}
+          <button 
+            className={styles.addQuestionsBtn}
             onClick={handleQuestionCreation}
-          >Add Questions</button>
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className={styles.loaderWrapper}>
+                <span className={styles.loader}></span>
+                ...
+              </span>
+            ) : "Add Questions"}
+          </button>
         </div>
       </div>
 
