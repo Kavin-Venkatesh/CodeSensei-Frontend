@@ -7,7 +7,6 @@ import Carousel from "../../components/Carousel/Carousel";
 import styles from "./Homepage.module.css";
 
 import Title from "../../assets/Title.png";
-import DefaultProfile from "../../assets/CodeSensei_Logo.png";
 import { VscFoldDown } from "react-icons/vsc";
 import { FaCode } from "react-icons/fa";
 import { FaBars } from "react-icons/fa";

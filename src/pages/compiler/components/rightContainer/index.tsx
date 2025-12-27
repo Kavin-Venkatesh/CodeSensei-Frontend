@@ -74,7 +74,6 @@ const RightContainer = () => {
     const [testCases, setTestCases] = useState<TestCase[]>([]);
     const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
     const [selectedResultTestCase, setSelectedResultTestCase] = useState(0);
-    const [isExecuting, setIsExecuting] = useState(false);
 
     const [prevSubmission, setPrevSubmission] = useState<Submission>({
         code: "",

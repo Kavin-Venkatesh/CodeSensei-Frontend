@@ -23,7 +23,7 @@ interface Topics {
     topic_id: number,
     topic_title: string,
     topic_description: string,
-    is_completed: 0 | 1,
+    is_completed: number,
     language_id: number
 }
 
@@ -36,17 +36,6 @@ interface TopicsApiResponse {
     };
 }
 
-interface Sample {
-    input: string,
-    output: string,
-    explanation: string
-}
-interface Question {
-    title: string,
-    difficulty_level: string,
-    description: string,
-    samples: Sample[]
-}
 
 interface TopicContentResponse {
     success: boolean;
@@ -74,16 +63,12 @@ const LearningPage = () => {
     const [isContentLoading, setIsContentLoading] = useState(true);
     const [topicData, setTopicData] = useState<TopicContentResponse["data"]["content"] | null>(null);
 
-    const [question, setQuestion] = useState<Question | null>(null);
 
     const { id } = useParams();
 
 const fetchTopics = async () => {
     try {
-        console.log("Fetching topics for learning path...");
         const courseId = id;
-        console.log("Course ID:", courseId);
-
         if (!courseId) {
             console.error("Course ID is missing. Cannot fetch topics.");
             return;
@@ -91,15 +76,11 @@ const fetchTopics = async () => {
 
         const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
         const accessToken = localStorage.getItem("access_token");
-
-        // Try to get user id from localStorage (set on login). Backend also accepts req.user if auth middleware is used.
         const storedUser = localStorage.getItem("user");
         const userId = storedUser ? Number(JSON.parse(storedUser).id) : undefined;
 
         if (!userId) {
             console.warn("User ID not found in localStorage. Backend requires user_id query param unless auth middleware supplies req.user.");
-            // You can still call the endpoint without user_id if your server uses req.user from token,
-            // otherwise consider redirecting to login or setting user_id on login.
         }
         
         const response = await axios.get<TopicsApiResponse>(`${backendUrl}/api/topics/course/${courseId}`, {
@@ -113,8 +94,6 @@ const fetchTopics = async () => {
         });
 
         const topics = response.data.data.topics || [];
-        console.log("Raw topics data:", topics);
-        // Ensure is_completed is numeric 0 | 1
         const normalizedTopics = topics.map(t => ({
             ...t,
             is_completed: Number(t.is_completed) === 1 ? 1 : 0,
@@ -122,7 +101,6 @@ const fetchTopics = async () => {
             language_id: Number(t.language_id),
         }));
 
-        console.log("Fetched topics:", normalizedTopics);
         setLearningPath(normalizedTopics);
 
         const firstIncomplete = normalizedTopics.find(topic => topic.is_completed !== 1);
@@ -140,7 +118,6 @@ const fetchTopics = async () => {
 
     const fetchTopicContent = async (topicId: number) => {
         try {
-            console.log("Fetching content for topic ID:", topicId);
             setIsContentLoading(true);
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
             const accessToken = localStorage.getItem("access_token");
@@ -152,7 +129,6 @@ const fetchTopics = async () => {
                     })
                 }
             });
-            console.log("Topic content response:", response.data);
             setTopicData(response.data.data.content);
             setIsContentLoading(false);
             // Handle the content as needed
@@ -177,36 +153,6 @@ const fetchTopics = async () => {
 
 
     useEffect(() => {
-        const fetchLatestQuestion = async () => {
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-            const accessToken = localStorage.getItem("access_token");
-            const topic_id = selectedTopic?.topic_id;
-
-            if (!topic_id) {
-                return;
-            }
-            try {
-                const response = await axios.get(`${backendUrl}/api/topics/latest-question`, {
-                    params: { topic_id },
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(accessToken && {
-                            Authorization: `Bearer ${accessToken}`
-                        })
-                    }
-                });
-
-                if (response.data.success && response.data.data) {
-                    setQuestion(response.data.data);
-                } else {
-                    setQuestion(null); // No question found
-                }
-            } catch (err) {
-                console.error("Error fetching latest question:", err);
-            }
-        };
-
-        fetchLatestQuestion();
         fetchTopicContent(selectedTopic?.topic_id || 0);
     }, [selectedTopic]);
 
