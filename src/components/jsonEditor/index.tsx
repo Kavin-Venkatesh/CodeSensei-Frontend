@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import styles from "./jsonEditor.module.css";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
 interface JsonEditorProps {

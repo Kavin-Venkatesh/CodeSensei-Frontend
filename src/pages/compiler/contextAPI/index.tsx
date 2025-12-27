@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Loading } from "../../../components/Loading";
 
 interface TestCase {
   test_case_id: number;
@@ -45,7 +46,7 @@ export const QuestionProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [currentQuestion, setCurrentQuestionState] = useState<Question | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const { id } = useParams();
-
+  const [loading , setLoading] = useState(true);
   const questionsToastedRef = React.useRef(false);
   const submissionsToastedRef = React.useRef(false);
 
@@ -63,6 +64,7 @@ export const QuestionProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (!id) {
       console.warn("User ID is not found");
+      setLoading(false);
       return;
     }
 
@@ -143,6 +145,7 @@ export const QuestionProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const init = async () => {
       const subs = await fetchSubmissions();
       await fetchQuestions(subs);
+      setLoading(false);
     };
 
     init();
@@ -183,6 +186,10 @@ export const QuestionProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (idx > 0) setCurrentQuestionState(questions[idx - 1]);
   };
 
+  if( loading ){
+    return <Loading />;
+  }
+  
   return (
     <QuestionContext.Provider
       value={{

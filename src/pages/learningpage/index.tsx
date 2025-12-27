@@ -427,10 +427,8 @@ const fetchTopics = async () => {
                     </div>
 
 
-                    {question === null ? "" : (
-                        <AssessPanel  languageId={selectedTopic?.language_id || 0} />
-                    )}
 
+                        <AssessPanel  languageId={selectedTopic?.language_id || 0} />
 
                     <div className={styles.learningNavigation}>
                         <button

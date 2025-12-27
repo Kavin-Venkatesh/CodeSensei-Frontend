@@ -82,30 +82,6 @@ const RightContainer = () => {
         user_id: 0,
     });
 
-
-    // Initialize test cases & code when question changes
-    // useEffect(() => {
-    //     if (!currentQuestion) return;
-
-    //     const backendCases: TestCase[] = currentQuestion.test_cases?.map((tc: any) => ({
-    //         id: tc.test_case_id,
-    //         input: tc.input || "",
-    //         output: tc.output || "",
-    //         isBackend: true,
-    //     })) || [];
-
-    //     setTestCases(backendCases);
-    //     setSelectedTestCase(backendCases[0]?.id || null);
-
-    //     if (!(currentQuestion.question_id in codes)) {
-    //         setCodes((prev) => ({
-    //             ...prev,
-    //             [currentQuestion.question_id]: "",
-    //         }));
-    //     }
-    // }, [currentQuestion, submissions]);
-
-
     useEffect(() => {
         if (!currentQuestion) return;
 

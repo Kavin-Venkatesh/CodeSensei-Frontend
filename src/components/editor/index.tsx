@@ -16,7 +16,7 @@ export const languageIdToMonacoLanguage: Record<number, string> = {
   63: 'javascript',   // JavaScript (Node.js 12.14.0)
   91: 'java',         // Java (OpenJDK 13.0.1)
   54: 'cpp',          // C++ (GCC 9.2.0)
-  50: 'c',            // C (GCC 9.2.0)
+  104: 'c',            // C (GCC 9.2.0)
   51: 'csharp',       // C# (Mono 6.6.0.161)
   68: 'php',          // PHP (7.4.1)
   72: 'ruby',         // Ruby (2.7.0)
@@ -30,7 +30,7 @@ export const languageNameToId: Record<string, number> = {
   javascript: 63,
   java: 91,
   cpp: 54,
-  c: 50,
+  c: 104,
 };
 
 loader.config({ monaco });

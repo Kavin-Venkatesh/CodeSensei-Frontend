@@ -467,13 +467,14 @@
   background: #1e1e1e;
   border-radius: 6px;
   background-color: #212529;
+  overflow: auto;
   margin: 0.5rem;
-  height: 40rem;   /* or vh based */
+  height: 40rem;  
 }
 
 .outputContent {
-  flex: 1;             /* fill available space */
-  overflow-y: auto;    /* ✅ scrolls */
+  flex: 1;            
+  overflow-x: auto; 
   padding: 0.5rem;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size : 1.4rem;
@@ -482,11 +483,11 @@
 .consoleSuccess {
   margin: 0.5rem;
   font-size: large;
-  color: var(--success); /* greenish for success */
+  color: var(--success);
 }
 
 .consoleError {
-  color: var(--error); /* reddish for errors */
+  color: var(--error); 
 }
 
 .consolePlaceholder {

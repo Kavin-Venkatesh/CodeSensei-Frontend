@@ -6,13 +6,12 @@ import LearningPage from "./pages/learningpage";
 import CompilerPage from "./pages/compiler";
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem("access_token");
   return token ? <>{children}</> : <Navigate to="/" replace />;
 };
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <BrowserRouter>
       <Routes>

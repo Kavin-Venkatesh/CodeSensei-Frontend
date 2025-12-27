@@ -75,7 +75,8 @@ const EditorComponent = ({ languageId }: { languageId: number }) => {
                         "Content-Type": "application/json"
                     }
                 });
-
+            
+            console.log("Execution response:", response.data);
             setResult(
                 {
                     output: response.data.output,
