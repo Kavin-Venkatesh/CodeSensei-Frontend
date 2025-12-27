@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 
 import Carousel from "../../components/Carousel/Carousel";
-import styles from "./Homepage.module.css";
+import styles from "./homepage.module.css";
 
 import Title from "../../assets/Title.png";
 import { VscFoldDown } from "react-icons/vsc";
